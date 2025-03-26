@@ -3,8 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { ConfigModule } from '@nestjs/config';
-import { RedisOptions } from './common/config/app-options.constants';
-import { CacheModule } from '@nestjs/cache-manager';
+
 import { AppConfigModule } from './common/config/app-config.module';
 import { AppConfigService } from './common/config/app-config.service';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -22,7 +21,6 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
 
 @Module({
   imports: [
-    CacheModule.registerAsync(RedisOptions),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
