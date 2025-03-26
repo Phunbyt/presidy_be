@@ -22,6 +22,7 @@ import { SupportMessage } from 'src/schemas/support-message.schema';
 import { Family } from 'src/schemas/family.schema';
 import { MailService } from '../mail/mail.service';
 import { User } from 'src/schemas/user.schema';
+import { SubscribeDto } from './dto/subscribe.dto';
 
 @Injectable()
 export class PlanService {
@@ -55,6 +56,15 @@ export class PlanService {
     }
     return userPlans;
   }
+  async findAllPublicPlans() {
+    const publicPlans = await this.planModel.find({ status: 'active' });
+
+    if (!publicPlans) {
+      return [];
+    }
+
+    return publicPlans;
+  }
 
   async joinPlan(userId: string, planId: string, planEmail: string) {
     try {
@@ -80,9 +90,6 @@ export class PlanService {
       const foundPlan = await this.userPlanModel
         .findOne(query)
         .populate('user');
-
-      console.log(foundPlan);
-      console.log('foundPlan....');
 
       const planIds = foundPlan?.planIds || [];
 
@@ -120,10 +127,6 @@ export class PlanService {
         },
       });
 
-      console.log(planId);
-      console.log(familyInfo);
-      console.log('familyInfo....');
-
       if (!familyInfo) {
         const newFamily = await this.familyModel.create({
           users: [new Types.ObjectId(userId)],
@@ -155,7 +158,7 @@ export class PlanService {
         familyInfoQuery,
         {
           $set: {
-            planIds: updatedFamilyUserList,
+            users: updatedFamilyUserList,
           },
           $inc: {
             familyActiveMembers: 1,
@@ -200,12 +203,15 @@ export class PlanService {
     return availablePlans;
   }
 
-  async subscribeToPlan(user: UserType, planId: any) {
+  async subscribeToPlan(user: UserType, subscribeDto: SubscribeDto) {
     try {
-      const id = planId;
+      const { planId, email } = subscribeDto;
+
+      console.log({ planId, email });
+      console.log('{ planId, email }.....');
 
       const foundPlan = await this.planModel.findOne({
-        _id: id.planId,
+        _id: new Types.ObjectId(planId),
         status: PlanStatus.ACTIVE,
       });
 
@@ -223,7 +229,7 @@ export class PlanService {
         metadata: {
           userId: user._id,
           planId: foundPlan._id,
-          email: id.email,
+          email: email,
         },
       };
 
@@ -312,22 +318,21 @@ export class PlanService {
     return newDispute;
   }
 
-  async supportMessage(user: UserType, supportMessageDto: SupportMessageDto) {
+  async supportMessage(supportMessageDto: SupportMessageDto) {
     // check plan in db
-    const { message } = supportMessageDto;
+    const { message, email } = supportMessageDto;
 
     // record message
 
     const newDispute = await this.supportMessageModel.create({
       message,
-      user: user._id,
+      user: email,
     });
 
     // send email to admin
     await this.mailService.sendSupportMessage({
-      name: user.firstName,
       message,
-      email: user.email,
+      email: email,
     });
 
     return newDispute;

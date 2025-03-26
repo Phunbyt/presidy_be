@@ -16,6 +16,7 @@ import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator
 import { UserType } from 'src/common/constants/types';
 import { Public } from 'src/common/decorators/public.decorator';
 import { PlanDisputeDto, SupportMessageDto } from './dto/plan-dispute.dto';
+import { SubscribeDto } from './dto/subscribe.dto';
 
 @Controller('plan')
 export class PlanController {
@@ -38,9 +39,18 @@ export class PlanController {
     return this.planService.findAllAvailablePlans(user);
   }
 
+  @Public()
+  @Get('public')
+  findAllPublicPlans() {
+    return this.planService.findAllPublicPlans();
+  }
+
   @Post('subscribe')
-  subscribeToPlan(@GetCurrentUser() user: UserType, @Body() planId: string) {
-    return this.planService.subscribeToPlan(user, planId);
+  subscribeToPlan(
+    @GetCurrentUser() user: UserType,
+    @Body() subscribeDto: SubscribeDto,
+  ) {
+    return this.planService.subscribeToPlan(user, subscribeDto);
   }
 
   @Get('transactions')
@@ -56,12 +66,10 @@ export class PlanController {
     return this.planService.planDispute(user, planDisputeDto);
   }
 
+  @Public()
   @Post('message')
-  supportMessage(
-    @GetCurrentUser() user: UserType,
-    @Body() supportMessageDto: SupportMessageDto,
-  ) {
-    return this.planService.supportMessage(user, supportMessageDto);
+  supportMessage(@Body() supportMessageDto: SupportMessageDto) {
+    return this.planService.supportMessage(supportMessageDto);
   }
 
   // TODO: Add opt out endpoint

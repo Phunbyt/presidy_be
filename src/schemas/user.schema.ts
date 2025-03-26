@@ -9,6 +9,9 @@ export class User {
   @Prop({ required: true })
   public lastName: string;
 
+  @Prop({ required: true })
+  public country: string;
+
   @Prop({
     required: true,
     unique: true,
@@ -43,6 +46,9 @@ export class User {
 
   @Prop({ default: '' })
   public password: string;
+
+  @Prop({ default: false })
+  public isVerified: boolean;
 }
 
 export type UserDocument = HydratedDocument<User>;

@@ -26,9 +26,6 @@ export class AuthController {
   @Public()
   @Post('sign-in')
   signIn(@Body() signInDto: SignInDto) {
-    console.log(signInDto);
-    console.log('signInDto....');
-
     return this.authService.signIn(signInDto);
   }
 
@@ -69,12 +66,28 @@ export class AuthController {
     return this.authService.sendOtp(email.toLowerCase());
   }
 
+  @Public()
+  @Post('reset-otp')
+  resetOtp(@Body('email') email: string) {
+    return this.authService.resetOtp(email.toLowerCase());
+  }
+
+  @Post('send-otp/existing-user')
+  sendExistingUserOtp(
+    @Body('email') email: string,
+    @GetCurrentUser() user: UserType,
+  ) {
+    return this.authService.sendExistingUserOtp(email.toLowerCase(), user);
+  }
+
   // TODO: receive otp and token to specify which route/endpoint made the call
   // you want to verify
-  @Public()
   @Post('verify-otp')
-  verifyOtp(@Body() verifyOtpByEmailDto: VerifyOtpByEmailDto) {
-    return this.authService.verifyOtp(verifyOtpByEmailDto);
+  verifyOtp(
+    @GetCurrentUser() user: UserType,
+    @Body() verifyOtpByEmailDto: VerifyOtpByEmailDto,
+  ) {
+    return this.authService.verifyOtp(user, verifyOtpByEmailDto);
   }
 
   @Patch('change-info')

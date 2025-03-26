@@ -23,6 +23,7 @@ export class CurrentUserInterceptor implements NestInterceptor {
       request.currentUser = JSON.parse(tokenData);
     } else if (userId) {
       const user = await this.userService.findUserById(userId);
+
       // we need to pass this down to the decorator. SO we assign the user to request because req can be retrieved inside the decorator
       request.currentUser = user;
     }

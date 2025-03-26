@@ -34,14 +34,13 @@ export class MailService {
   public async sendSupportMessage(
     sendSupportMessageDto: SendSupportMessageDto,
   ) {
-    const { name, message, email } = sendSupportMessageDto;
+    const { message, email } = sendSupportMessageDto;
 
     await this.mailService.sendMail({
       to: SUPPORT_EMAIL,
       subject: 'Attention New Dispute',
       template: './support',
       context: {
-        name,
         message,
         email,
       },
@@ -71,20 +70,25 @@ export class MailService {
   }
 
   public async sendUserFamilyLink(sendFamilyLinkDto: SendFamilyLinkDto) {
-    const { name, email, familyLink, planName } = sendFamilyLinkDto;
+    try {
+      const { name, email, familyLink, planName } = sendFamilyLinkDto;
 
-    await this.mailService.sendMail({
-      to: email,
-      subject: 'Welcome to the Family',
-      template: './family-link',
-      context: {
-        name,
-        familyLink,
-        planName,
-      },
-    });
+      await this.mailService.sendMail({
+        to: email,
+        subject: 'Welcome to the Family',
+        template: './family-link',
+        context: {
+          name,
+          familyLink,
+          planName,
+        },
+      });
 
-    return 'This action adds a new mail';
+      return 'This action adds a new mail';
+    } catch (error) {
+      console.log(error);
+      console.log('error.... emial');
+    }
   }
   public async sendNewFamilyPrompt(
     sendNewFamilyPromptDto: SendNewFamilyPromptDto,

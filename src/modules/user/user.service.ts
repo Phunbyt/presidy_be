@@ -15,14 +15,24 @@ import { hashDataWithBycrypt } from 'src/common/helpers/bycrypt.helper';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   public async create(createUserDto: CreateUserDto) {
-    const { firstName, lastName, username, email, password } = createUserDto;
-
-    const user = await this.userModel.create({
+    const {
       firstName,
       lastName,
       username,
       email,
       password,
+      country,
+      isVerified = false,
+    } = createUserDto;
+
+    const user = await this.userModel.create({
+      firstName,
+      lastName,
+      username,
+      country,
+      email,
+      password,
+      isVerified,
     });
 
     return user;
@@ -35,7 +45,7 @@ export class UserService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto, currentUser: UserType) {
-    const { firstName, lastName, username } = updateUserDto;
+    const { firstName, lastName, username, isVerified } = updateUserDto;
     const { email } = currentUser;
 
     const user = await this.findUserByEmail({ email });
@@ -48,6 +58,7 @@ export class UserService {
       firstName: firstName || user.firstName,
       lastName: lastName || user.lastName,
       username: username || user.username,
+      isVerified: isVerified || user.isVerified,
     };
 
     await this.userModel.updateOne({ email }, { $set: update }, { new: true });
@@ -76,7 +87,7 @@ export class UserService {
 
     await this.userModel.updateOne({ email }, { $set: update }, { new: true });
 
-    return 'user updated successfully';
+    return user;
   }
 
   async findUserById(id: string) {

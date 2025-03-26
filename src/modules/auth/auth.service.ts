@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotAcceptableException,
@@ -230,6 +231,7 @@ export class AuthService {
       lastName: fullName.familyName || lastName,
       username: fullName.nickname || username,
       email,
+      country: 'ng',
     };
 
     //  hash user password
@@ -255,6 +257,7 @@ export class AuthService {
     const response = await fetch('https://www.googleapis.com/userinfo/v2/me', {
       headers: { Authorization: 'Bearer ' + googleSignUpToken },
     });
+
     const { firstName, lastName, username } = this.userUniqueInfo();
 
     const user = await response.json();
@@ -274,12 +277,12 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    const otpCredentials = await this.generateOTPCredentials();
+    // const otpCredentials = await this.generateOTPCredentials();
 
-    await this.saveEmailOTPCredentials({
-      email,
-      otp: `signup-${otpCredentials.hashedOTP}`,
-    });
+    // await this.saveEmailOTPCredentials({
+    //   email,
+    //   otp: `signup-${otpCredentials.hashedOTP}`,
+    // });
 
     //  hash user password
     const password = email;
@@ -290,12 +293,14 @@ export class AuthService {
       lastName: family_name || lastName,
       username: given_name || username,
       email,
+      country: 'ng',
     };
 
     //  create user with userservice
     const newUser = await this.userService.create({
       ...payload,
       password: hashedPassword,
+      isVerified: true,
     });
 
     const { accessToken } = await this.getToken({
@@ -309,10 +314,53 @@ export class AuthService {
     return { newUser, accessToken };
   }
 
-  async sendOtp(email: string) {
-    console.log(email);
-    console.log('email....');
+  async sendExistingUserOtp(email: string, user: UserType) {
+    // get email
+    // find user with user service
 
+    const userEmail = user.email;
+
+    if (userEmail !== email) {
+      throw new ForbiddenException('God forbids this operation... lol');
+    }
+
+    const existingUser = await this.userService.findUserByEmail({
+      email,
+    });
+
+    if (!existingUser) {
+      throw new BadRequestException('User not found');
+    }
+
+    // create otp value
+    const otpCredentials = await this.generateOTPCredentials();
+
+    // send otp string to user email
+    this.mailService.sendOTPMail({
+      name: existingUser.firstName.toUpperCase(),
+      otp: otpCredentials.otp,
+      email,
+    });
+
+    //  store hash in db alongside initial route metadata
+
+    await this.saveEmailOTPCredentials({
+      email,
+      otp: `signup-${otpCredentials.hashedOTP}`,
+    });
+
+    //  return true or false
+
+    return {
+      otp: otpCredentials.hashedOTP,
+      to: email,
+      emailStatus: 'Message Sent',
+      status: true,
+      email,
+    };
+  }
+
+  async sendOtp(email: string) {
     // get email
     // find user with user service
     const existingUser = await this.userService.findUserByEmail({
@@ -351,10 +399,60 @@ export class AuthService {
     };
   }
 
-  async verifyOtp(verifyOtpByEmailDto: VerifyOtpByEmailDto) {
+  async resetOtp(email: string) {
     // get email
+    // find user with user service
+    const existingUser = await this.userService.findUserByEmail({
+      email,
+    });
 
+    if (!existingUser) {
+      throw new BadRequestException(
+        'Bruh please... are you registered at all?',
+      );
+    }
+
+    // create otp value
+    const otpCredentials = await this.generateOTPCredentials();
+
+    // send otp string to user email
+    this.mailService.sendOTPMail({
+      name: existingUser.firstName.toUpperCase(),
+      otp: otpCredentials.otp,
+      email,
+    });
+
+    //  store hash in db alongside initial route metadata
+
+    await this.saveEmailOTPCredentials({
+      email,
+      otp: `reset-${otpCredentials.hashedOTP}`,
+    });
+
+    const { accessToken } = await this.getToken({
+      userId: existingUser._id,
+      email: existingUser.email,
+      role: 'user',
+    });
+
+    return {
+      otp: otpCredentials.hashedOTP,
+      to: email,
+      emailStatus: 'Message Sent',
+      status: true,
+      email,
+      accessToken,
+    };
+  }
+
+  async verifyOtp(user: UserType, verifyOtpByEmailDto: VerifyOtpByEmailDto) {
+    // get email
+    const userEmail = user.email;
     const { email, otp, route } = verifyOtpByEmailDto;
+
+    if (userEmail !== email) {
+      throw new ForbiddenException('God forbids this operation... lol');
+    }
 
     // fecth otp and otp metadata from userservice
     const otpData = await this.otpModel.findOne({ email });
@@ -372,6 +470,13 @@ export class AuthService {
     }
 
     const verified = await compareDataWithBycrypt(otp, comparevalue[1]);
+
+    if (verified) {
+      const existingUser = await this.userService.updateUser(
+        { isVerified: true },
+        user,
+      );
+    }
 
     // return true of false
     return {
@@ -392,11 +497,18 @@ export class AuthService {
   async updatePassword(updatePasswordDto: UpdatePasswordDto, user: UserType) {
     // get password and update as needed
     // return updated info
-    const updatedUser = await this.userService.updatePassword(
+    const existingUser = await this.userService.updatePassword(
       updatePasswordDto,
       user,
     );
-    return updatedUser;
+
+    const { accessToken } = await this.getToken({
+      userId: existingUser._id,
+      email: existingUser.email,
+      role: 'user',
+    });
+
+    return { existingUser, accessToken };
   }
 
   async resetPassword(updatePasswordDto: UpdatePasswordDto) {
@@ -416,6 +528,7 @@ export class AuthService {
       updatePasswordDto,
       user,
     );
+
     return updatedUser;
   }
 

@@ -1,11 +1,21 @@
 import { Injectable } from '@nestjs/common';
 import { CreateFamilyDto } from './dto/create-family.dto';
 import { UpdateFamilyDto } from './dto/update-family.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Family } from 'src/schemas/family.schema';
+import { Model, Types } from 'mongoose';
 
 @Injectable()
 export class FamilyService {
-  create(createFamilyDto: CreateFamilyDto) {
-    return 'This action adds a new family';
+  constructor(@InjectModel(Family.name) private familyModel: Model<Family>) {}
+
+  async create(createFamilyDto: CreateFamilyDto) {
+    const family = await this.familyModel.create({
+      ...createFamilyDto,
+      planId: new Types.ObjectId(createFamilyDto.planId),
+      familyActiveMembers: 0,
+    });
+    return family;
   }
 
   findAll() {

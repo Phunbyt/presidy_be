@@ -17,6 +17,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RolesGuard } from './common/guards/roles.guard';
 import { PlanModule } from './modules/plan/plan.module';
 import { PaystackHookModule } from './hooks/paystack-hook/paystack-hook.module';
+import { FamilyModule } from './modules/family/family.module';
+import { TransactionsModule } from './modules/transactions/transactions.module';
 
 @Module({
   imports: [
@@ -42,6 +44,8 @@ import { PaystackHookModule } from './hooks/paystack-hook/paystack-hook.module';
     AuthModule,
     PlanModule,
     PaystackHookModule,
+    FamilyModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -16,6 +16,8 @@ export class PaystackHookService {
     try {
       const { data, event } = createPaystackHookDto;
 
+      console.log({ data, event });
+
       const { metadata } = data;
 
       if (event === 'charge.success') {
