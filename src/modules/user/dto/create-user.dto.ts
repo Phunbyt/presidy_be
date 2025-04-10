@@ -72,4 +72,9 @@ export class UpdateUserDto {
   @IsNotEmpty()
   @IsBoolean()
   public isVerified?: boolean;
+
+  @IsOptional()
+  @IsNotEmpty()
+  @IsBoolean()
+  public isModerator?: boolean;
 }

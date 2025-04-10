@@ -49,13 +49,9 @@ export class AuthService {
   async signUp(signUpDto: SignUpDto) {
     const { firstName, email, password } = signUpDto;
 
-    console.log(signUpDto);
-    console.log('signUpDto....');
-
     // find existing users
 
     const existingUser = await this.userService.findUserByEmail({ email });
-    console.log(existingUser);
 
     if (existingUser) {
       throw new BadRequestException('User already exists');
@@ -89,7 +85,6 @@ export class AuthService {
       otp: otpCredentials.otp,
       email,
     });
-    console.log({ newUser, accessToken });
 
     return { newUser, accessToken };
   }
@@ -271,7 +266,6 @@ export class AuthService {
     // find existing users
 
     const existingUser = await this.userService.findUserByEmail({ email });
-    console.log(existingUser);
 
     if (existingUser) {
       throw new BadRequestException('User already exists');
@@ -308,8 +302,6 @@ export class AuthService {
       email: newUser.email,
       role: 'user',
     });
-
-    console.log({ newUser, accessToken });
 
     return { newUser, accessToken };
   }
@@ -617,12 +609,6 @@ export class AuthService {
     });
 
     const username: string = uniqueNamesGenerator(customConfig);
-
-    console.log({
-      firstName,
-      lastName,
-      username,
-    });
 
     return {
       firstName,

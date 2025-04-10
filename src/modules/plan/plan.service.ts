@@ -23,6 +23,7 @@ import { Family } from 'src/schemas/family.schema';
 import { MailService } from '../mail/mail.service';
 import { User } from 'src/schemas/user.schema';
 import { SubscribeDto } from './dto/subscribe.dto';
+import { ModeratorPlan } from 'src/schemas/moderator-plan.schema';
 
 @Injectable()
 export class PlanService {
@@ -35,6 +36,8 @@ export class PlanService {
     @InjectModel(Family.name) private familyModel: Model<Family>,
     @InjectModel(SupportMessage.name)
     private supportMessageModel: Model<SupportMessage>,
+    @InjectModel(ModeratorPlan.name)
+    private moderatorPlanModel: Model<ModeratorPlan>,
     private appConfigService: AppConfigService,
     private mailService: MailService,
   ) {}
@@ -166,6 +169,18 @@ export class PlanService {
         },
         { upsert: true },
       );
+      await this.moderatorPlanModel.updateOne(
+        familyInfoQuery,
+        {
+          $set: {
+            users: updatedFamilyUserList,
+          },
+          $inc: {
+            familyActiveMembers: 1,
+          },
+        },
+        { upsert: true },
+      );
       // send notification to user
 
       await this.mailService.sendUserFamilyLink({
@@ -176,10 +191,7 @@ export class PlanService {
       });
 
       return updatedPlanList;
-    } catch (error) {
-      console.log(error);
-      console.log('error....');
-    }
+    } catch (error) {}
   }
 
   async findAllAvailablePlans(user: UserType) {
@@ -207,9 +219,6 @@ export class PlanService {
     try {
       const { planId, email } = subscribeDto;
 
-      console.log({ planId, email });
-      console.log('{ planId, email }.....');
-
       const foundPlan = await this.planModel.findOne({
         _id: new Types.ObjectId(planId),
         status: PlanStatus.ACTIVE,
@@ -217,6 +226,23 @@ export class PlanService {
 
       if (!foundPlan) {
         throw new NotFoundException('Plan not found');
+      }
+
+      const familyInfo = await this.familyModel.findOne({
+        planId: new Types.ObjectId(planId),
+        familyActiveMembers: {
+          $lt: foundPlan.familySize,
+        },
+        familyLink: {
+          $ne: '',
+        },
+      });
+
+      if (familyInfo) {
+        return {
+          canBeModerator: true,
+          message: 'Family is unavalable at the moment',
+        };
       }
 
       // todo: check to confirm special email plans

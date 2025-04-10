@@ -28,6 +28,9 @@ export class Transaction {
 
   @Prop({ required: true })
   public amount: string;
+
+  @Prop({ default: false })
+  public isModerator: boolean;
 }
 
 export type TransactionDocument = HydratedDocument<Transaction>;

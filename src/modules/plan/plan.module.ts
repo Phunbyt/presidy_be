@@ -14,6 +14,10 @@ import {
 } from 'src/schemas/support-message.schema';
 import { Family, FamilySchema } from 'src/schemas/family.schema';
 import { MailModule } from '../mail/mail.module';
+import {
+  ModeratorPlan,
+  ModeratorPlanSchema,
+} from 'src/schemas/moderator-plan.schema';
 
 @Module({
   imports: [
@@ -25,6 +29,7 @@ import { MailModule } from '../mail/mail.module';
       { name: Dispute.name, schema: DisputeSchema },
       { name: SupportMessage.name, schema: SupportMessageSchema },
       { name: Family.name, schema: FamilySchema },
+      { name: ModeratorPlan.name, schema: ModeratorPlanSchema },
     ]),
     AppConfigModule,
     MailModule,

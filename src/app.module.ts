@@ -18,6 +18,7 @@ import { PlanModule } from './modules/plan/plan.module';
 import { PaystackHookModule } from './hooks/paystack-hook/paystack-hook.module';
 import { FamilyModule } from './modules/family/family.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
+import { ModeratorModule } from './modules/moderator/moderator.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { TransactionsModule } from './modules/transactions/transactions.module';
     PaystackHookModule,
     FamilyModule,
     TransactionsModule,
+    ModeratorModule,
   ],
   controllers: [AppController],
   providers: [

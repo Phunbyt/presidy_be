@@ -36,10 +36,30 @@ export function IsNotFraudEmail(validationOptions?: ValidationOptions) {
       propertyName,
       options: validationOptions,
       validator: {
-        validate: (value: any): boolean =>
-          !unwanted.includes(value.split('@')[1].split('.')[0]),
+        validate: (value: any): boolean => {
+          // Check if value exists and is a string
+          if (typeof value !== 'string') {
+            return false;
+          }
+
+          // Split email into parts
+          const parts = value.split('@');
+          if (parts.length !== 2) {
+            // Must have exactly one @ symbol
+            return false;
+          }
+
+          const domainParts = parts[1].split('.');
+          if (domainParts.length < 2) {
+            // Must have at least one dot in domain
+            return false;
+          }
+
+          const domainName = domainParts[0];
+          return !unwanted.includes(domainName);
+        },
         defaultMessage: (validationArguments?: ValidationArguments): string =>
-          `this email domain is not allowed`,
+          `This email domain is not allowed`,
       },
     });
   };

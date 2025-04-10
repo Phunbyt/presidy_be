@@ -85,10 +85,7 @@ export class MailService {
       });
 
       return 'This action adds a new mail';
-    } catch (error) {
-      console.log(error);
-      console.log('error.... emial');
-    }
+    } catch (error) {}
   }
   public async sendNewFamilyPrompt(
     sendNewFamilyPromptDto: SendNewFamilyPromptDto,
