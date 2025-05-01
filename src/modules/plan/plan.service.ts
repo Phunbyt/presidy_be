@@ -238,7 +238,7 @@ export class PlanService {
         },
       });
 
-      if (familyInfo) {
+      if (!familyInfo) {
         return {
           canBeModerator: true,
           message: 'Family is unavalable at the moment',
