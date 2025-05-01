@@ -25,7 +25,7 @@ import { AppConfigService } from 'src/common/config/app-config.service';
           from: '"Presidy" <donotreply@presidy.com>',
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          dir: join(__dirname, '', 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -33,7 +33,7 @@ import { AppConfigService } from 'src/common/config/app-config.service';
         },
         options: {
           partials: {
-            dir: join(__dirname + '/templates/partials'),
+            dir: join(__dirname + '' + '/templates/partials'),
             options: {
               strict: true,
             },
