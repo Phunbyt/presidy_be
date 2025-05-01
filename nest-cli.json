@@ -5,7 +5,12 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      "modules/mail/templates/**/*"
+      "modules/mail/templates/**/*",
+      "./otp-notification",
+      "./support",
+      "./dispute",
+      "./family-link",
+      "./new-family"
     ],
     "watchAssets": true
   }
