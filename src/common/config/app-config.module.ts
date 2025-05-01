@@ -11,7 +11,7 @@ import { AppConfigService } from './app-config.service';
         APP_ENV: Joi.string()
           .valid('dev', 'stage', 'test', 'prod', 'production', 'development')
           .default('dev'),
-        APP_NAME: Joi.string().default('StraitPay'),
+        APP_NAME: Joi.string().default('Presidy'),
         APP_PORT: Joi.number().default('3000'),
         SENTRY_DNS: Joi.string().uri().default(''),
       }),
