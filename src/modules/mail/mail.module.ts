@@ -22,13 +22,21 @@ import { AppConfigService } from 'src/common/config/app-config.service';
           },
         },
         defaults: {
-          from: '"StraitPay" <donotreply@straitpay.com>',
+          from: '"Presidy" <donotreply@presidy.com>',
         },
         template: {
           dir: join(__dirname, 'templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
+          },
+        },
+        options: {
+          partials: {
+            dir: join(__dirname + '/templates/partials'),
+            options: {
+              strict: true,
+            },
           },
         },
       }),
