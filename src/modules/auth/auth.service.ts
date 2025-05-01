@@ -160,21 +160,40 @@ export class AuthService {
       headers: { Authorization: 'Bearer ' + googleSignInToken },
     });
 
+    const { firstName, lastName, username } = this.userUniqueInfo();
+
     const user = await response.json();
     // get user email and password
-    const { email, verified_email } = user;
+    const { email, verified_email, family_name, given_name } = user;
 
     if (!verified_email) {
       throw new BadRequestException('Only verified emails allowed...');
     }
 
     // find user with user service
-    const existingUser = await this.userService.findUserByEmail({
+    let existingUser = await this.userService.findUserByEmail({
       email,
     });
 
     if (!existingUser) {
-      throw new BadRequestException('Invalid credentials...');
+      //  hash user password
+      const password = email;
+      const hashedPassword = await hashDataWithBycrypt(password);
+
+      const payload = {
+        firstName: given_name || firstName,
+        lastName: family_name || lastName,
+        username: given_name || username,
+        email,
+        country: 'ng',
+      };
+
+      //  create user with userservice
+      existingUser = await this.userService.create({
+        ...payload,
+        password: hashedPassword,
+        isVerified: true,
+      });
     }
 
     const { accessToken } = await this.getToken({
@@ -270,13 +289,6 @@ export class AuthService {
     if (existingUser) {
       throw new BadRequestException('User already exists');
     }
-
-    // const otpCredentials = await this.generateOTPCredentials();
-
-    // await this.saveEmailOTPCredentials({
-    //   email,
-    //   otp: `signup-${otpCredentials.hashedOTP}`,
-    // });
 
     //  hash user password
     const password = email;
