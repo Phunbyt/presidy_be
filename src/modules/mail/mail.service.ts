@@ -83,6 +83,9 @@ export class MailService {
         moderatorEmail,
       } = sendFamilyLinkDto;
 
+      console.log(sendFamilyLinkDto);
+      console.log('sendFamilyLinkDto....');
+
       if (!specialDetails) {
         await this.mailService.sendMail({
           to: email,
