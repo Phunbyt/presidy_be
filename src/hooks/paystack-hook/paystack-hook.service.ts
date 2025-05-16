@@ -16,9 +16,13 @@ export class PaystackHookService {
     try {
       const { data, event } = createPaystackHookDto;
 
-      // console.log({ data, event });
+      console.log({ data, event });
+      console.log('{ data, event }......');
 
       const { metadata } = data;
+
+      console.log(metadata);
+      console.log('metadata.....');
 
       if (event === 'charge.success') {
         await this.planService.joinPlan(
@@ -40,24 +44,9 @@ export class PaystackHookService {
       }
     } catch (error) {
       console.log(error);
+      console.log('error........createPaystackHookDto');
     }
 
     return 'This action adds a new paystackHook';
-  }
-
-  findAll() {
-    return `This action returns all paystackHook`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} paystackHook`;
-  }
-
-  update(id: number, updatePaystackHookDto: UpdatePaystackHookDto) {
-    return `This action updates a #${id} paystackHook`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} paystackHook`;
   }
 }

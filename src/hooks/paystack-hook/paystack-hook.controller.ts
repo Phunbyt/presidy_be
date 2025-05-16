@@ -21,27 +21,4 @@ export class PaystackHookController {
   create(@Body() createPaystackHookDto: any) {
     return this.paystackHookService.create(createPaystackHookDto);
   }
-
-  @Get('callback')
-  findAll() {
-    return this.paystackHookService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.paystackHookService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updatePaystackHookDto: UpdatePaystackHookDto,
-  ) {
-    return this.paystackHookService.update(+id, updatePaystackHookDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.paystackHookService.remove(+id);
-  }
 }
