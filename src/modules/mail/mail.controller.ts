@@ -14,4 +14,10 @@ export class MailController {
   private create(@Body() sendOTPMailDto: any) {
     return this.mailService.sendSupportDisputeMessage(sendOTPMailDto);
   }
+
+  @Public()
+  @Post('test')
+  private test(@Body() sendOTPMailDto: any) {
+    return this.mailService.testSendUserFamilyLink(sendOTPMailDto);
+  }
 }
