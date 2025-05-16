@@ -16,6 +16,10 @@ import {
 } from 'src/schemas/moderator-plan.schema';
 import { Family, FamilySchema } from 'src/schemas/family.schema';
 import { Plan, PlanSchema } from 'src/schemas/plan.schema';
+import {
+  ModeratorReceipt,
+  ModeratorReceiptSchema,
+} from 'src/schemas/moderator-receipt.schema';
 
 @Module({
   controllers: [ModeratorController],
@@ -26,6 +30,7 @@ import { Plan, PlanSchema } from 'src/schemas/plan.schema';
       { name: User.name, schema: UserSchema },
       { name: Transaction.name, schema: TransactionSchema },
       { name: ModeratorPlan.name, schema: ModeratorPlanSchema },
+      { name: ModeratorReceipt.name, schema: ModeratorReceiptSchema },
       { name: Family.name, schema: FamilySchema },
       { name: Plan.name, schema: PlanSchema },
     ]),

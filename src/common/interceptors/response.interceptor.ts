@@ -24,9 +24,16 @@ export class ResponseInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((res: unknown) => this.responseHandler(res, context)),
       catchError((err: HttpException) => {
+
+        const response =
+          err && typeof err.getResponse === 'function'
+            ? err.getResponse()
+            : null;
         this.logger.debug(err.stack);
         this.logger.debug(err.message);
-
+        this.logger.debug(context.switchToHttp().getRequest().user);
+        this.logger.debug(context.switchToHttp().getRequest().url);
+        this.logger.debug(response);
         return throwError(() => this.errorHandler(err, context));
       }),
     );

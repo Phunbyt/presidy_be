@@ -71,21 +71,79 @@ export class MailService {
 
   public async sendUserFamilyLink(sendFamilyLinkDto: SendFamilyLinkDto) {
     try {
-      const { name, email, familyLink, planName } = sendFamilyLinkDto;
+      const {
+        name,
+        email,
+        familyLink,
+        presidyLink,
+        planName,
+        specialDetails,
+        moderatorDetails,
+        webDetails,
+        moderatorEmail,
+      } = sendFamilyLinkDto;
 
-      await this.mailService.sendMail({
-        to: email,
-        subject: 'Welcome to the Family',
-        template: './family-link',
-        context: {
-          name,
-          familyLink,
-          planName,
-        },
-      });
+      if (!specialDetails) {
+        await this.mailService.sendMail({
+          to: email,
+          subject: 'Welcome to the Family',
+          template: './family-link',
+          context: {
+            name,
+            familyLink,
+            planName,
+          },
+        });
+      } else if (moderatorDetails) {
+        await this.mailService.sendMail({
+          to: email,
+          subject: 'Welcome to the Family',
+          template: './family-link-moderator',
+          context: {
+            name,
+            familyLink,
+            planName,
+          },
+        });
+
+        await this.mailService.sendMail({
+          to: moderatorEmail,
+          subject: 'Family Invite Needed',
+          template: './moderator-alert',
+          context: {
+            email,
+            planName,
+          },
+        });
+      } else if (webDetails) {
+        console.log('here', {
+          to: email,
+          subject: 'Welcome to the Family',
+          template: './family-link-extra',
+          context: {
+            name,
+            presidyLink,
+            planName,
+          },
+        });
+
+        await this.mailService.sendMail({
+          to: email,
+          subject: 'Welcome to the Family',
+          template: './family-link-extra',
+          context: {
+            name,
+            familyLink: presidyLink,
+            planName,
+          },
+        });
+      }
 
       return 'This action adds a new mail';
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+      console.log('error....');
+    }
   }
   public async sendNewFamilyPrompt(
     sendNewFamilyPromptDto: SendNewFamilyPromptDto,

@@ -183,11 +183,21 @@ export class PlanService {
       );
       // send notification to user
 
+      const moderatorPlan = await this.moderatorPlanModel
+        .findOne(familyInfoQuery)
+        .populate('user');
+
       await this.mailService.sendUserFamilyLink({
         name: user.firstName,
         email: planEmail,
         familyLink: familyInfo.familyLink,
+        presidyLink: familyInfo.presidyLink,
         planName: existingPlan.name,
+        planId: existingPlan._id as unknown as string,
+        specialDetails: existingPlan.specialDetails,
+        moderatorDetails: existingPlan.moderatorDetails,
+        webDetails: existingPlan.webDetails,
+        moderatorEmail: moderatorPlan.user.email,
       });
 
       return updatedPlanList;
@@ -267,6 +277,9 @@ export class PlanService {
 
       return { paymentLink: data.data.authorization_url };
     } catch (error) {
+      console.log(error);
+      console.log('error....');
+
       throw new InternalServerErrorException();
     }
   }

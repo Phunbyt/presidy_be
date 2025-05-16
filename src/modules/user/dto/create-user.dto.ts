@@ -75,6 +75,10 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsNotEmpty()
+  public phoneNumber?: number;
+
+  @IsOptional()
+  @IsNotEmpty()
   @IsBoolean()
   public isModerator?: boolean;
 }

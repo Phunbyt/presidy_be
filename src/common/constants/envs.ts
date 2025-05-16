@@ -18,4 +18,8 @@ export default registerAs('app', () => ({
   paystackUrl: process.env.PAYSTACK_URL,
   paystackSK: process.env.PAYSTACK_SK,
   paystackPK: process.env.PAYSTACK_PK,
+  cloudRegion: process.env.AWS_REGION,
+  cloudAKID: process.env.AWS_ACCESS_KEY_ID,
+  cloudSAK: process.env.AWS_SECRET_ACCESS_KEY,
+  cloudBN: process.env.AWS_BUCKET_NAME,
 }));

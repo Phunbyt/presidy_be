@@ -34,6 +34,15 @@ export class Plan {
   @Prop({ default: false })
   public specialEmail: boolean;
 
+  @Prop({ default: false })
+  public specialDetails: boolean;
+
+  @Prop({ default: false })
+  public moderatorDetails: boolean;
+
+  @Prop({ default: false })
+  public webDetails: boolean;
+
   @Prop({ default: 5 })
   public familySize: number;
 }

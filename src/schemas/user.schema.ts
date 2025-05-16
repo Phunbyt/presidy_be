@@ -47,6 +47,9 @@ export class User {
   @Prop({ default: '' })
   public password: string;
 
+  @Prop()
+  public phoneNumber: number;
+
   @Prop({ default: false })
   public isVerified: boolean;
 

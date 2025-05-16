@@ -11,12 +11,17 @@ import { ModeratorPlan } from 'src/schemas/moderator-plan.schema';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { Family } from 'src/schemas/family.schema';
 import { Plan } from 'src/schemas/plan.schema';
+import { ModeratorReceipt } from 'src/schemas/moderator-receipt.schema';
+import { uploadFile } from 'src/common/helpers/fileUpload.helper';
+import * as OTPEngine from 'generate-password';
 
 @Injectable()
 export class ModeratorService {
   constructor(
     @InjectModel(BankAccount.name) private bankAccountModel: Model<BankAccount>,
     @InjectModel(Transaction.name) private transactionModel: Model<Transaction>,
+    @InjectModel(ModeratorReceipt.name)
+    private moderatorReceiptModel: Model<ModeratorReceipt>,
     @InjectModel(ModeratorPlan.name)
     private moderatorPlanModel: Model<ModeratorPlan>,
     @InjectModel(Family.name) private familyModel: Model<Family>,
@@ -34,6 +39,7 @@ export class ModeratorService {
     await this.userService.updateUser(
       {
         isModerator: true,
+        phoneNumber: createModeratorDto.phoneNumber,
       },
       user,
     );
@@ -73,11 +79,24 @@ export class ModeratorService {
     }
     // use needed plan infor to populate family model
 
+    const familyUrlId = OTPEngine.generate({
+      length: 10,
+      numbers: true,
+      uppercase: true,
+      symbols: false,
+      lowercase: true,
+    });
+
+    console.log(createPlanDto);
+    console.log('createPlanDto....');
+
     const family = await this.familyModel.create({
       ...createPlanDto,
       planId: new Types.ObjectId(createPlanDto.planId),
       familyActiveMembers: 0,
+      familyUrlId,
       familyMembersLimit: existingPlan.familySize,
+      presidyLink: `https://www.presidy.com/family/${familyUrlId}`,
     });
     // use needed plan infor to populate moderator plan model model
 
@@ -116,6 +135,16 @@ export class ModeratorService {
       .populate('planId')
       .sort({ createdAt: -1 });
 
+    const moderatorReceipts = await this.moderatorReceiptModel
+      .find({ user: user._id })
+      .populate({
+        path: 'planId',
+        populate: {
+          path: 'planId', // this is the planId inside ModeratorPlan
+          model: 'Plan',
+        },
+      })
+      .sort({ createdAt: -1 });
     const structuredModeratorPlans = moderatorPlans.map((plan) => {
       return {
         id: plan._id,
@@ -151,6 +180,7 @@ export class ModeratorService {
     return {
       transactions,
       bankAccounts,
+      moderatorReceipts,
       moderatorPlans: structuredModeratorPlans.filter(Boolean),
       emptyPlans: emptyPlans.filter(Boolean),
     };
@@ -177,15 +207,28 @@ export class ModeratorService {
     return emptyPlans;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} moderator`;
-  }
+  async uploadFile(file, user, planIdValue) {
+    const receiptLink = await uploadFile({
+      key: `${Date.now()}${user._id}`,
+      body: file.buffer,
+    });
 
-  update(id: number, updateModeratorDto: UpdateModeratorDto) {
-    return `This action updates a #${id} moderator`;
-  }
+    const newModeratorReceipt = await this.moderatorReceiptModel.create({
+      user: user._id,
+      planId: new Types.ObjectId(planIdValue),
+      receiptLink,
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} moderator`;
+    const moderatorReceipt = await this.moderatorReceiptModel
+      .findOne({ user: user._id, _id: newModeratorReceipt._id })
+      .populate({
+        path: 'planId',
+        populate: {
+          path: 'planId', // this is the planId inside ModeratorPlan
+          model: 'Plan',
+        },
+      });
+
+    return moderatorReceipt;
   }
 }

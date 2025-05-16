@@ -12,7 +12,16 @@ export class Family {
   public planId: Plan;
 
   @Prop({ default: '' })
+  public presidyLink: string;
+
+  @Prop({ default: '' })
   public familyLink: string;
+
+  @Prop({ default: '' })
+  public familyUrlId: string;
+
+  @Prop({ default: '' })
+  public webDetailsData: string;
 
   @Prop()
   public familyMembersLimit: number;

@@ -5,7 +5,7 @@ export class CreateFamilyDto {
   @IsNotEmpty({ message: 'planId can not be empty' })
   public planId: string;
 
-  @IsNotEmpty({ message: 'familyLink can not be empty' })
+  @IsNotEmpty({ message: 'familyLink can not be empty..' })
   public familyLink: string;
 
   @IsNotEmpty({ message: 'familyMembersLimit can not be empty' })

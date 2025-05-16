@@ -45,8 +45,14 @@ export class UserService {
   }
 
   async updateUser(updateUserDto: UpdateUserDto, currentUser: UserType) {
-    const { firstName, lastName, username, isVerified, isModerator } =
-      updateUserDto;
+    const {
+      firstName,
+      lastName,
+      username,
+      isVerified,
+      isModerator,
+      phoneNumber,
+    } = updateUserDto;
     const { email } = currentUser;
 
     const user = await this.findUserByEmail({ email });
@@ -61,6 +67,7 @@ export class UserService {
       username: username || user.username,
       isVerified: isVerified || user.isVerified,
       isModerator: isModerator || user.isModerator,
+      phoneNumber: phoneNumber || user.phoneNumber,
     };
 
     await this.userModel.updateOne({ email }, { $set: update }, { new: true });
