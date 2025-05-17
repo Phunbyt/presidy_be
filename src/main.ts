@@ -18,6 +18,6 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   console.log('pronto........');
 
-  await app.listen(3000);
+  await app.listen(3000, () => console.log('App is running......🧨🧨🧨'));
 }
 bootstrap();
