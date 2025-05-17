@@ -379,7 +379,7 @@ export class AuthService {
     const otpCredentials = await this.generateOTPCredentials();
 
     // send otp string to user email
-    this.mailService.sendOTPMail({
+    await this.mailService.sendOTPMail({
       name: existingUser.firstName.toUpperCase(),
       otp: otpCredentials.otp,
       email,
