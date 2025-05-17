@@ -158,7 +158,12 @@ export class PlanService {
       };
 
       await this.familyModel.updateOne(
-        familyInfoQuery,
+        {
+          planId: new Types.ObjectId(planId),
+          familyActiveMembers: {
+            $lt: existingPlan.familySize,
+          },
+        },
         {
           $set: {
             users: updatedFamilyUserList,
@@ -170,7 +175,12 @@ export class PlanService {
         { upsert: true },
       );
       await this.moderatorPlanModel.updateOne(
-        familyInfoQuery,
+        {
+          planId: new Types.ObjectId(planId),
+          familyActiveMembers: {
+            $lt: existingPlan.familySize,
+          },
+        },
         {
           $set: {
             users: updatedFamilyUserList,
@@ -184,7 +194,12 @@ export class PlanService {
       // send notification to user
 
       const moderatorPlan = await this.moderatorPlanModel
-        .findOne(familyInfoQuery)
+        .findOne({
+          planId: new Types.ObjectId(planId),
+          familyActiveMembers: {
+            $lt: existingPlan.familySize,
+          },
+        })
         .populate('user');
 
       await this.mailService.sendUserFamilyLink({

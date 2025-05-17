@@ -15,7 +15,7 @@ export class BankAccount {
   public lastName: string;
 
   @Prop()
-  public accountNumber: number;
+  public accountNumber: string;
 
   @Prop()
   public bankName: string;

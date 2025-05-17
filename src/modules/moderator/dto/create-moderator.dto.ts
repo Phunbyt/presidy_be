@@ -12,8 +12,7 @@ export class CreateModeratorDto {
   public phoneNumber: number;
 
   @IsNotEmpty({ message: 'accountNumber can not be empty' })
-  @IsNumber({}, { message: 'accountNumber must be a number' })
-  public accountNumber: number;
+  public accountNumber: string;
 
   @IsNotEmpty({ message: 'bankName can not be empty' })
   public bankName: string;

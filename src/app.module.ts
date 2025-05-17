@@ -20,9 +20,14 @@ import { FamilyModule } from './modules/family/family.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { ModeratorModule } from './modules/moderator/moderator.module';
 import { MailModule } from './modules/mail/mail.module';
+import { AccountModule } from './modules/account/account.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import { RedisOptions } from './common/config/app-options.constants';
 
 @Module({
   imports: [
+    CacheModule.registerAsync(RedisOptions),
+
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
@@ -48,6 +53,7 @@ import { MailModule } from './modules/mail/mail.module';
     TransactionsModule,
     ModeratorModule,
     MailModule,
+    AccountModule,
   ],
   controllers: [AppController],
   providers: [
