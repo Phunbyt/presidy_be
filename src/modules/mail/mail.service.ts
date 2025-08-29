@@ -69,6 +69,23 @@ export class MailService {
     return 'This action adds a new mail';
   }
 
+  public async sendBroadcastEmail( users:{email:string; firstname:string}[], message:string ){
+    for(const user of users){
+      await this.mailService.sendMail({
+        to:user.email,
+        subject:'A broadcast from presidy',
+        template:'./broacast',// there is no template for that
+        context:{
+          name:user.firstname,
+          message:"You can be A moderator if there are no families to join.",
+        }
+      })
+
+    }
+    return 'Broadcast emails sent successfully';
+  }
+ 
+
   public async sendUserFamilyLink(sendFamilyLinkDto: SendFamilyLinkDto) {
     try {
       const {

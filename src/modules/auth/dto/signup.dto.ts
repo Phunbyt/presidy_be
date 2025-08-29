@@ -1,7 +1,9 @@
 import {
   IsEmail,
+  isNotEmpty,
   IsNotEmpty,
   IsOptional,
+  IsString,
   Length,
   Matches,
   NotContains,
@@ -42,6 +44,11 @@ export class SignUpDto {
   @IsNotEmpty({ message: 'Password can not be empty' })
   @Length(8, 1000, { message: 'Password must be a minimum of 8 characters' })
   public password: string;
+
+  @IsNotEmpty()
+  @IsString()
+  @Length(11, 11,{message:'phone number must be 11 digits'})
+  public phoneNumber:number;
 }
 
 export class SignInDto {

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import { AppConfigModule } from './common/config/app-config.module';
 import { AppConfigService } from './common/config/app-config.service';
@@ -23,7 +23,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { AccountModule } from './modules/account/account.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './common/config/app-options.constants';
-
+import { MailerModule } from '@nestjs-modules/mailer';
 @Module({
   imports: [
     CacheModule.registerAsync(RedisOptions),
@@ -45,6 +45,7 @@ import { RedisOptions } from './common/config/app-options.constants';
         uri: configService.dbUri, // Use ConfigService to get MongoDB URI
       }),
     }),
+    MailModule,
     UserModule,
     AuthModule,
     PlanModule,
@@ -52,7 +53,6 @@ import { RedisOptions } from './common/config/app-options.constants';
     FamilyModule,
     TransactionsModule,
     ModeratorModule,
-    MailModule,
     AccountModule,
   ],
   controllers: [AppController],

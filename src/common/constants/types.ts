@@ -6,3 +6,5 @@ export interface UserType {
   email: string;
   password: string;
 }
+
+//localhost/api/v1
