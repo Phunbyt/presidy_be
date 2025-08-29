@@ -4,6 +4,7 @@ import { MailerService } from '@nestjs-modules/mailer';
 import { SUPPORT_EMAIL } from 'src/common/constants/const';
 import { SendFamilyLinkDto } from './dto/send-family-link.dto';
 import { SendSupportDisputeDto } from './dto/send-support-dispute.dto';
+import { CreateUserDto } from '../user/dto/create-user.dto';
 import {
   SendNewFamilyPromptDto,
   SendSupportMessageDto,
@@ -69,7 +70,8 @@ export class MailService {
     return 'This action adds a new mail';
   }
 
-  public async sendBroadcastEmail( users:{email:string; firstname:string}[], message:string ){
+  public async sendBroadcastEmail(createUserDto: CreateUserDto[],message:string) {
+    const users=createUserDto.map(user=>({email:user.email,firstname:user.firstName}))
     for(const user of users){
       await this.mailService.sendMail({
         to:user.email,
