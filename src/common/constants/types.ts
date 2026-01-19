@@ -7,4 +7,3 @@ export interface UserType {
   password: string;
 }
 
-//localhost/api/v1

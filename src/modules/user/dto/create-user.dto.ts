@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsNotEmpty,
   IsOptional,
+  IsString,
   Length,
   Matches,
   NotContains,
@@ -75,7 +76,8 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsNotEmpty()
-  public phoneNumber?: number;
+  @IsString() 
+  public phoneNumber?: string;// changed to a string
 
   @IsOptional()
   @IsNotEmpty()

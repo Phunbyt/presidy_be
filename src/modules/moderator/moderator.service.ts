@@ -40,6 +40,7 @@ export class ModeratorService {
       {
         isModerator: true,
         phoneNumber: createModeratorDto.phoneNumber,
+      
       },
       user,
     );

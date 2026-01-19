@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config'; //  Config service has been removed 
 
 import { AppConfigModule } from './common/config/app-config.module';
 import { AppConfigService } from './common/config/app-config.service';
@@ -24,19 +24,26 @@ import { AccountModule } from './modules/account/account.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { RedisOptions } from './common/config/app-options.constants';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { BullModule } from '@nestjs/bull';
 @Module({
   imports: [
     CacheModule.registerAsync(RedisOptions),
-
+    BullModule.forRoot({
+      redis :{
+        host:'localhost',
+        port:6379,
+      }
+    }),
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
         limit: 1000,
       },
     ]),
+
     ConfigModule.forRoot({
       envFilePath: ['.env'],
-      isGlobal: true,
+      isGlobal: true,   
     }),
     MongooseModule.forRootAsync({
       imports: [AppConfigModule], // Import ConfigModule to use ConfigService

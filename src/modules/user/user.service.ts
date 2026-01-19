@@ -10,11 +10,11 @@ import { Model } from 'mongoose';
 import { UserType } from 'src/common/constants/types';
 import { UpdatePasswordDto } from '../auth/dto/signup.dto';
 import { hashDataWithBycrypt } from 'src/common/helpers/bycrypt.helper';
-import { MailService } from '../mail/mail.service';
+//import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>, private mailService:MailService ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   
   public async create(createUserDto: CreateUserDto) {
     const {

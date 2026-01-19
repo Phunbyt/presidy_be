@@ -19,7 +19,7 @@ export class MailService {
   constructor(
     private readonly mailService: MailerService,
     @InjectQueue('email') private readonly emailQueue: Queue,
-    @InjectModel('User') private readonly userModel: Model<any> 
+    @InjectModel('User') private readonly userModel: Model<any> // Add this line
   ) {}
 
   public async sendOTPMail(sendOTPMailDto: SendOTPMailDto) {

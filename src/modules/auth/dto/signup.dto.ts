@@ -7,6 +7,7 @@ import {
   Length,
   Matches,
   NotContains,
+  
 } from 'class-validator';
 import { Transform } from 'class-transformer';
 import { IsNotFraudEmail } from 'src/common/helpers/validators.helper';
@@ -24,7 +25,7 @@ export class SignUpDto {
   @Transform((param) => param.value.toLowerCase().trim())
   public lastName: string;
 
-  @Length(2, 2, { message: 'Invalid country length' })
+  @Length(2, 2, { message: 'Invalid country length' }) // I am having an Issue here. Is it the abbrevation or the Full Country spelling
   @IsNotEmpty({ message: 'country can not be empty' })
   @Transform((param) => param.value.toLowerCase().trim())
   public country: string;

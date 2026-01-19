@@ -6,9 +6,15 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
 import { join } from 'path';
 import { AppConfigModule } from 'src/common/config/app-config.module';
 import { AppConfigService } from 'src/common/config/app-config.service';
-
+import { BullModule } from '@nestjs/bull';
+import { MailProcessor } from './mail.processor';
+import { MongooseModule } from '@nestjs/mongoose';
+import { UserSchema } from 'src/schemas/user.schema';
 @Module({
-  imports: [
+  imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    BullModule.registerQueue({
+      name: 'email',
+    }),
     MailerModule.forRootAsync({
       imports: [AppConfigModule],
       inject: [AppConfigService],
@@ -43,7 +49,7 @@ import { AppConfigService } from 'src/common/config/app-config.service';
     }),
   ],
   controllers: [MailController],
-  providers: [MailService],
+  providers: [MailService, MailProcessor],
   exports: [MailService],
 })
 export class MailModule {}
