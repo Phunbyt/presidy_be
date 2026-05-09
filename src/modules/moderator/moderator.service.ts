@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateModeratorDto } from './dto/create-moderator.dto';
 import { UpdateModeratorDto } from './dto/update-moderator.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -11,9 +11,12 @@ import { ModeratorPlan } from 'src/schemas/moderator-plan.schema';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { Family } from 'src/schemas/family.schema';
 import { Plan } from 'src/schemas/plan.schema';
+import { User } from 'src/schemas/user.schema';
 import { ModeratorReceipt } from 'src/schemas/moderator-receipt.schema';
 import { uploadFile } from 'src/common/helpers/fileUpload.helper';
 import * as OTPEngine from 'generate-password';
+import { names } from 'unique-names-generator';
+import { NOTFOUND } from 'dns';
 
 @Injectable()
 export class ModeratorService {
@@ -26,6 +29,7 @@ export class ModeratorService {
     private moderatorPlanModel: Model<ModeratorPlan>,
     @InjectModel(Family.name) private familyModel: Model<Family>,
     @InjectModel(Plan.name) private planModel: Model<Plan>,
+    @InjectModel(User.name) private UserModel: Model<User>,
 
     private userService: UserService,
   ) {}
@@ -39,7 +43,7 @@ export class ModeratorService {
     await this.userService.updateUser(
       {
         isModerator: true,
-        phoneNumber: createModeratorDto.phoneNumber,
+        // phoneNumber: createModeratorDto.phoneNumber,
       
       },
       user,
@@ -231,5 +235,22 @@ export class ModeratorService {
       });
 
     return moderatorReceipt;
+  }
+
+  async get_your_users(user:UserType){
+    const moderator_plans = await this.moderatorPlanModel.find({
+      user:user._id
+    })
+
+    const all_users_id = moderator_plans.flatMap((plan => {
+      return plan.users
+    }))
+
+    if (all_users_id.length == 0){
+      throw new HttpException("Users not found",404)
+    }
+  const actual_users = await this.UserModel.find({_id:{$in :all_users_id}})
+
+  return actual_users
   }
 }

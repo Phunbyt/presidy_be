@@ -17,7 +17,7 @@ export class MailProcessor{
             await this.mailerService.sendMail({
                 to:email,
                 subject:'A broadcast from Presidy',
-                template: join(__dirname, 'templates', 'broadcast_email'),
+                template: 'broadcast_email',
                 context:{
                     name:firstname,
                     message:message,
@@ -28,7 +28,7 @@ export class MailProcessor{
             console.log(`Email sent successfully to ${email}`)
             return {success:true, email}
         }catch(error){
-            console.error(`Failed to send to ${email}`, error.message || error)
+            console.error(`Failed to send to ${email}`,error)
             throw error;
         }
 

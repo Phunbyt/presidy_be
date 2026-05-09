@@ -12,7 +12,7 @@ export class PaystackHookService {
     private planService: PlanService,
     @InjectModel(Transaction.name) private transactionModel: Model<Transaction>,
   ) {}
-  async create(createPaystackHookDto: any) {
+  async create(createPaystackHookDto: any) { // Intialize payment
     try {
       const { data, event } = createPaystackHookDto;
 
@@ -25,11 +25,16 @@ export class PaystackHookService {
       console.log('metadata.....');
 
       if (event === 'charge.success') {
-        await this.planService.joinPlan(
-          metadata.userId,
-          metadata.planId,
-          metadata.email,
-        );
+       
+
+        const existingTransaction = await this.transactionModel.findOne({
+          txRef:data.reference,
+        })
+
+        if(existingTransaction){
+          console.log(`This transaction ${data.reference} has already been processed`)
+          return 'Duplicate event, already processed'
+        }
 
         await this.transactionModel.create({
           user: new Types.ObjectId(metadata.userId),
@@ -41,6 +46,11 @@ export class PaystackHookService {
           channel: data.channel,
           txRef: data.reference,
         });
+         await this.planService.joinPlan(
+          metadata.userId,
+          metadata.planId,
+          metadata.email,
+        );
       }
     } catch (error) {
       console.log(error);

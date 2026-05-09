@@ -24,6 +24,8 @@ import { MailService } from '../mail/mail.service';
 import { User } from 'src/schemas/user.schema';
 import { SubscribeDto } from './dto/subscribe.dto';
 import { ModeratorPlan } from 'src/schemas/moderator-plan.schema';
+// import { metadata } from 'reflect-metadata/no-conflict';
+// import { string } from 'joi';
 
 @Injectable()
 export class PlanService {
@@ -293,8 +295,40 @@ export class PlanService {
       return { paymentLink: data.data.authorization_url };
     } catch (error) {
       console.log(error);
-      console.log('error....');
+      throw new InternalServerErrorException();
+    }
+  }
 
+  async retryPayment(user: UserType,subscribeDto: SubscribeDto ) {
+      const { planId, email } = subscribeDto;
+    try {
+      const foundPlan = await this.planModel.findOne({
+        _id: new Types.ObjectId(planId),
+        status: PlanStatus.ACTIVE,
+      });
+      if (!foundPlan) {
+        throw new NotFoundException('Plan not found');
+      }
+      const url = this.appConfigService.paystackUrl;
+      const payload = {
+        amount: foundPlan.price,
+        email: email,
+        plan: foundPlan.planCode,
+        metadata: {
+          userId:user._id,
+          planId: foundPlan._id,
+          email,
+        },
+      };
+
+      const { data } = await axios.post(url, payload, {
+        headers: {
+          authorization: `Bearer ${this.appConfigService.paystackSK}`,
+        },
+      });
+      return { paymentLink: data.data.authorization_url };
+    } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException();
     }
   }

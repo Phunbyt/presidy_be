@@ -17,6 +17,7 @@ import { UserType } from 'src/common/constants/types';
 import { Public } from 'src/common/decorators/public.decorator';
 import { PlanDisputeDto, SupportMessageDto } from './dto/plan-dispute.dto';
 import { SubscribeDto } from './dto/subscribe.dto';
+import { any } from 'joi';
 
 @Controller('plan')
 export class PlanController {
@@ -52,6 +53,14 @@ export class PlanController {
   ) {
     return this.planService.subscribeToPlan(user, subscribeDto);
   }
+  @Post('retryPayment')
+  retryPayment(
+    @GetCurrentUser() user:UserType,
+    @Body()  subscribeDto:SubscribeDto,
+  ){
+    return this.planService.retryPayment(user,subscribeDto)
+  }
+
 
   @Get('transactions')
   planTransactions(@GetCurrentUser() user: UserType) {
@@ -71,6 +80,6 @@ export class PlanController {
   supportMessage(@Body() supportMessageDto: SupportMessageDto) {
     return this.planService.supportMessage(supportMessageDto);
   }
-
+  
   // TODO: Add opt out endpoint
 }

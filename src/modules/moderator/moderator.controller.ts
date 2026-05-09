@@ -19,6 +19,7 @@ import { UserType } from 'src/common/constants/types';
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import type { Multer } from 'multer';
 
 @Controller('moderator')
 export class ModeratorController {

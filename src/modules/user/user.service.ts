@@ -53,7 +53,7 @@ export class UserService {
       username,
       isVerified,
       isModerator,
-      phoneNumber,
+     // phoneNumber,
     } = updateUserDto;
     const { email } = currentUser;
 
@@ -69,10 +69,10 @@ export class UserService {
       username: username || user.username,
       isVerified: isVerified || user.isVerified,
       isModerator: isModerator || user.isModerator,
-      phoneNumber: phoneNumber || user.phoneNumber,
+      // phoneNumber: phoneNumber || user.phoneNumber,
     };
 
-    await this.userModel.updateOne({ email }, { $set: update }, { new: true });
+    await this.userModel.findOneAndUpdate({ email }, { $set: update }, { new: true });
 
     return 'user updated successfully';
   }
@@ -96,7 +96,7 @@ export class UserService {
       password: hashedPassword || user.password,
     };
 
-    await this.userModel.updateOne({ email }, { $set: update }, { new: true });
+    await this.userModel.findOneAndUpdate({ email }, { $set: update }, { new: true });
 
     return user;
   }

@@ -3,15 +3,17 @@ import { MailService } from './mail.service';
 import { MailController } from './mail.controller';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import { join } from 'path';
+import { join } from 'path'; // Ensure this is imported
 import { AppConfigModule } from 'src/common/config/app-config.module';
 import { AppConfigService } from 'src/common/config/app-config.service';
 import { BullModule } from '@nestjs/bull';
 import { MailProcessor } from './mail.processor';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/schemas/user.schema';
+
 @Module({
-  imports: [MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+  imports: [
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
     BullModule.registerQueue({
       name: 'email',
     }),
@@ -31,7 +33,8 @@ import { UserSchema } from 'src/schemas/user.schema';
           from: '"Presidy" <donotreply@presidy.com>',
         },
         template: {
-          dir: join(__dirname, 'templates'),
+          // This automatically points to the folder next to this module in 'dist'
+          dir: join(__dirname, 'templates'), 
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
@@ -39,7 +42,8 @@ import { UserSchema } from 'src/schemas/user.schema';
         },
         options: {
           partials: {
-            dir: join(__dirname + '/templates/partials'),
+            // FIX: Use comma separation for cross-platform path joining
+            dir: join(__dirname, 'templates', 'partials'), 
             options: {
               strict: true,
             },

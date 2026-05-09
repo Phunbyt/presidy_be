@@ -74,10 +74,10 @@ export class UpdateUserDto {
   @IsBoolean()
   public isVerified?: boolean;
 
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString() 
-  public phoneNumber?: string;// changed to a string
+  // @IsOptional()
+  // @IsNotEmpty()
+  // @IsString() 
+  // public phoneNumber?: string;
 
   @IsOptional()
   @IsNotEmpty()

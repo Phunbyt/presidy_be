@@ -46,10 +46,10 @@ export class SignUpDto {
   @Length(8, 1000, { message: 'Password must be a minimum of 8 characters' })
   public password: string;
 
-  @IsNotEmpty()
-  @IsString()
-  @Length(11, 11,{message:'phone number must be 11 digits'})
-  public phoneNumber:number;
+  // @IsNotEmpty()
+  // @IsString()
+  // @Length(11, 11,{message:'phone number must be 11 digits'})
+  // public phoneNumber:number;
 }
 
 export class SignInDto {

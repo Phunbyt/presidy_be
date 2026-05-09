@@ -17,7 +17,7 @@ export class Transaction {
   @Prop({ required: true })
   public email: string;
 
-  @Prop({ required: true })
+  @Prop({ required: true, unique:true })
   public txRef: string;
 
   @Prop({ required: true })
@@ -31,6 +31,8 @@ export class Transaction {
 
   @Prop({ default: false })
   public isModerator: boolean;
+
+  
 }
 
 export type TransactionDocument = HydratedDocument<Transaction>;
