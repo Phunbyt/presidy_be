@@ -84,6 +84,7 @@ export class PlanController {
   // For the admin Dashboard
 
   @Get('plans')
+  @Roles(Role.Admin)  
   getPlans(){
     return this.planService.getPlans()
   }

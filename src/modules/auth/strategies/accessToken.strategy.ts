@@ -6,6 +6,7 @@ import { AppConfigService } from 'src/common/config/app-config.service';
 type JwtPayload = {
   sub: string;
   username: string;
+  role:string
 };
 
 @Injectable()

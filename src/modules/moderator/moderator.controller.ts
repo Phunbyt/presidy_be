@@ -20,6 +20,8 @@ import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ModeratorFilterDto } from './dto/filter-moderator.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { Role } from 'src/common/constants/enums';
 import type { Multer } from 'multer';
 
 @Controller('moderator')
@@ -83,10 +85,12 @@ export class ModeratorController {
   }
   //For the Admin Dashoard
     @Get()
+    @Roles(Role.Admin)  
     getModerators(@Query() filter:ModeratorFilterDto){
         return this.moderatorService.getModerators(filter)
     }
     @Get(':id')
+    @Roles(Role.Admin)  
     getModerator(@Param('id') id:string){
         return this.moderatorService.getModerator(id)
     }    
