@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
-import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
-import { MailModule } from '../mail/mail.module';
-import { MailerModule } from '@nestjs-modules/mailer';
-import { AppConfigService } from 'src/common/config/app-config.service';
+import { ModeratorPlan, ModeratorPlanSchema } from 'src/schemas/moderator-plan.schema';
+import { Plan, PlanSchema } from 'src/schemas/plan.schema';
+import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
+
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    MailModule,
+    MongooseModule.forFeature([
+      { name: User.name, schema: UserSchema },
+      { name: ModeratorPlan.name, schema: ModeratorPlanSchema },
+      { name: Plan.name, schema: PlanSchema },
+      { name: UserPlan.name, schema: UserPlanSchema },
+    ]),
   ],
   controllers: [UserController],
   providers: [UserService],

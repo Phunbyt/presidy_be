@@ -6,32 +6,33 @@ import { join } from 'path';
 @Processor('email')
 export class MailProcessor{
 
-    constructor (private readonly mailerService:MailerService){}
+    constructor (private readonly mailerService:MailerService){
+        //console.log('MailProcessor Initailized')
+    }
 
 
-    @Process('broadcast')
-    async handleBroadcast(job:Job){
-        const {email,firstname,message} = job.data;
 
-        try{
-            await this.mailerService.sendMail({
-                to:email,
-                subject:'A broadcast from Presidy',
-                template: 'broadcast_email',
-                context:{
-                    name:firstname,
-                    message:message,
-                    email:email
-                }
-    
-            })
-            console.log(`Email sent successfully to ${email}`)
-            return {success:true, email}
-        }catch(error){
-            console.error(`Failed to send to ${email}`,error)
-            throw error;
-        }
+    @Process('bulk-email')
+    async handleBroadcast(job: Job) {
+    const { email, firstName, message, subject } = job.data;
 
-    
-    } 
+    const personalizedMessage = message.replace(/{name}/g, firstName);
+
+    try {
+        await this.mailerService.sendMail({
+            to: email,
+            subject,
+            template: join(__dirname, 'templates', 'broadcast'),
+            context: {
+                firstName,
+                message: personalizedMessage,
+            },
+        });
+        console.log(`Email sent successfully to ${email}`);
+        return { success: true, email };
+    } catch (error) {
+        console.error(`Failed to send to ${email}`, error);
+        throw error;
+    }
+}
 }

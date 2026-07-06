@@ -425,4 +425,11 @@ export class PlanService {
 
     return newDispute;
   }
+
+  // Get Plans For Admin
+    async getPlans() {
+        const data = await this.planModel.find().select('name logoUrl price').exec();
+        return { data };
+    }
+
 }

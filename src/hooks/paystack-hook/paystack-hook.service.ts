@@ -52,11 +52,43 @@ export class PaystackHookService {
           metadata.email,
         );
       }
-    } catch (error) {
+       else if(event === 'paymentrequest.pending'){
+      
+       }
+        else if(event === 'paymentrequest.success'){
+      
+       }
+        else if(event === 'subscription.create'){
+      
+       }
+       else if(event === 'subscription.disable'){
+      
+       }
+       else if(event === 'subscription.expiring_cards'){
+      
+       }
+       else if(event === 'subscription.not_renew'){
+      
+       }
+       else if(event === 'invoice.create'){
+      
+       }
+       else if(event === 'invoice.payment_failed'){
+      
+       }
+       else if(event === 'invoice.update'){
+      
+       }
+
+
+    }
+    
+     catch (error) {
       console.log(error);
       console.log('error........createPaystackHookDto');
     }
-
+    
+   
     return 'This action adds a new paystackHook';
   }
 }

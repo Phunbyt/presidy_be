@@ -3,7 +3,7 @@ import {
   Get,
   Post,
   Body,
-  Patch,
+  Query,
   Param,
   Delete,
   UseInterceptors,
@@ -19,6 +19,7 @@ import { UserType } from 'src/common/constants/types';
 import { GetCurrentUser } from 'src/common/decorators/get-current-user.decorator';
 import { CreatePlanDto } from './dto/create-plan.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ModeratorFilterDto } from './dto/filter-moderator.dto';
 import type { Multer } from 'multer';
 
 @Controller('moderator')
@@ -80,4 +81,13 @@ export class ModeratorController {
 
     return 'here';
   }
+  //For the Admin Dashoard
+    @Get()
+    getModerators(@Query() filter:ModeratorFilterDto){
+        return this.moderatorService.getModerators(filter)
+    }
+    @Get(':id')
+    getModerator(@Param('id') id:string){
+        return this.moderatorService.getModerator(id)
+    }    
 }

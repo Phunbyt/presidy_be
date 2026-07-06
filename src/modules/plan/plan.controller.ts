@@ -81,5 +81,11 @@ export class PlanController {
     return this.planService.supportMessage(supportMessageDto);
   }
   
-  // TODO: Add opt out endpoint
+  // For the admin Dashboard
+
+  @Get('plans')
+  getPlans(){
+    return this.planService.getPlans()
+  }
+
 }

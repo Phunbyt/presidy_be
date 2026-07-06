@@ -7,6 +7,8 @@ export default registerAs('app', () => ({
   jwtAccessSecret: process.env.JWT_ACCESS_SECRET,
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET,
   termiiSenderId: process.env.TERMII_SENDER_ID,
+  adminEmail: process.env.ADMIN_EMAIL,
+  adminPassword:process.env.ADMIN_PASSWORD,
   termiiAPIKey: process.env.TERMII_API_KEY,
   emailPort: process.env.EMAIL_PORT || 0,
   emailUsername: process.env.EMAIL_USERNAME,

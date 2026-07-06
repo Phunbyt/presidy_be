@@ -1,4 +1,4 @@
-import { BadRequestException, HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, Injectable,NotFoundException } from '@nestjs/common';
 import { CreateModeratorDto } from './dto/create-moderator.dto';
 import { UpdateModeratorDto } from './dto/update-moderator.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -15,8 +15,10 @@ import { User } from 'src/schemas/user.schema';
 import { ModeratorReceipt } from 'src/schemas/moderator-receipt.schema';
 import { uploadFile } from 'src/common/helpers/fileUpload.helper';
 import * as OTPEngine from 'generate-password';
+import { UserPlan } from 'src/schemas/user-plan.schema';
 import { names } from 'unique-names-generator';
 import { NOTFOUND } from 'dns';
+import { ModeratorFilterDto } from './dto/filter-moderator.dto';
 
 @Injectable()
 export class ModeratorService {
@@ -253,4 +255,102 @@ export class ModeratorService {
 
   return actual_users
   }
+
+  // Services For that Admin Dashboard
+async getModerators(filter: ModeratorFilterDto) {
+    const { search, isVerified, planId, page = 1, limit = 20 } = filter;
+
+    const query: any = { isModerator: true };
+
+    if (search) {
+        query.$or = [
+            { firstName: { $regex: search, $options: 'i' } },
+            { lastName:  { $regex: search, $options: 'i' } },
+            { email:     { $regex: search, $options: 'i' } },
+        ];
+    }
+    if (isVerified !== undefined) query.isVerified = isVerified;
+
+    // fetch all moderator plans once — reused for both plan filtering and enrichment
+    const allModeratorPlans = await this.moderatorPlanModel
+        .find()
+        .populate('planId', 'name logoUrl')
+        .lean();
+
+    const modPlanByUser = new Map(
+        allModeratorPlans.map((mp: any) => [mp.user.toString(), mp])
+    );
+
+    if (planId) {
+        const modIdsWithPlan = allModeratorPlans
+            .filter((mp: any) => mp.planId?._id?.toString() === planId)
+            .map((mp: any) => mp.user.toString());
+        query._id = { $in: modIdsWithPlan };
+    }
+
+    const skip = (page - 1) * limit;
+    const total = await this.UserModel.countDocuments(query);
+
+    const moderators = await this.UserModel
+        .find(query)
+        .select('-password')
+        .skip(skip)
+        .limit(limit)
+        .sort({ createdAt: -1 })
+        .exec();
+
+    const data = moderators.map((mod) => {
+        const modPlan = modPlanByUser.get(mod._id.toString());
+        return {
+    ...mod.toObject(),
+    userCount: modPlan?.users?.length ?? 0,
+    plan: modPlan?.planId ?? null,
+    //totalEarned: earningsMap.get(mod._id.toString()) ?? 0,
+    familyMembersLimit: modPlan?.familyMembersLimit ?? 5,
+};
+    });
+
+    return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+    };
+}
+
+
+async getModerator(id: string) {
+    const moderator = await this.UserModel
+        .findOne({ _id: id, isModerator: true })
+        .select('-password');
+    if (!moderator) throw new NotFoundException('This moderator does not exist');
+
+    const ModeratorPlan = await this.moderatorPlanModel
+        .findOne({ user: new Types.ObjectId(id) } as any)
+        .populate('users', 'firstName lastName email')
+        .populate('planId', 'name logoUrl');
+
+    // membership in this array IS the active condition — no UserPlan check needed
+    const enrichedUsers = (ModeratorPlan?.users ?? []).map((user: any) => ({
+        ...(user.toObject ? user.toObject() : user),
+        isActive: true,
+    }));
+
+    const earned = await this.transactionModel.aggregate([
+        { $match: { user: new Types.ObjectId(id), isModerator: true, status: 'success' } },
+        { $group: { _id: null, total: { $sum: { $toDouble: '$amount' } } } },
+    ]);
+
+    return {
+        moderator,
+        plan: ModeratorPlan?.planId ?? null,
+        users: enrichedUsers,
+        userCount: enrichedUsers.length,
+        totalEarned: earned[0]?.total ?? 0,
+         familyMembersLimit: ModeratorPlan?.familyMembersLimit ?? 5,
+    };
+}     
+
+  
 }
