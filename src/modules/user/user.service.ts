@@ -121,6 +121,7 @@ export class UserService {
 
   // For the Admin Dashboard
 
+  
 async getUsers(filter: FilterUserDto) {
     const { search, status, isModerator, isOffline, country, planId, moderatorId, page = 1, limit = 20 } = filter;
 
@@ -244,7 +245,6 @@ async getUsers(filter: FilterUserDto) {
         totalPages: Math.ceil(total / limit),
     };
 }
-
 async getUser(id: string) {
     const user = await this.userModel.findById(id).select('-password');
     if (!user) throw new NotFoundException('This user does not exist');
@@ -301,10 +301,4 @@ async getUserStats() {
 
     return { total, active, inactive, offline };
 }
-
-
- 
-
 }
-
-
