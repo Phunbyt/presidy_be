@@ -20,18 +20,16 @@ export class UserController {
   create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
-
+ @Get('stats')
+  @Roles(Role.Admin)
+  getStats(){
+    return this.userService.getUserStats()
+  }  
   @Get(':id')
   @Roles(Role.Admin)
   getUser(@Param('id') id:string){
     return this.userService.getUser(id)
   }
-
-  @Get('stats')
-  @Roles(Role.Admin)
-  getStats(){
-    return this.userService.getUserStats()
-  }  
     @Get()
     @Roles(Role.Admin)
     getUsers(@Query() filterUserDto:FilterUserDto ){

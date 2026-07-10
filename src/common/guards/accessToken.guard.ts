@@ -24,4 +24,10 @@ export class AccessTokenGuard extends AuthGuard('jwt') {
 
     return super.canActivate(context);
   }
+      handleRequest(err: any, user: any, info: any, context: ExecutionContext) {
+        const request = context.switchToHttp().getRequest();
+        request.currentUser = user;  // bridge passport's request.user → request.currentUser
+        return super.handleRequest(err, user, info, context);
+    }
+
 }

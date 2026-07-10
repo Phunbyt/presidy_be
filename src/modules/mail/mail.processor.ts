@@ -22,7 +22,7 @@ export class MailProcessor{
         await this.mailerService.sendMail({
             to: email,
             subject,
-            template: join(__dirname, 'templates', 'broadcast'),
+            template: join(__dirname, 'templates', 'broadcast_email'),
             context: {
                 firstName,
                 message: personalizedMessage,

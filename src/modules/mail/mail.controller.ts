@@ -1,9 +1,13 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body,Get } from '@nestjs/common';
 import { MailService } from './mail.service';
 import { SendOTPMailDto } from './dto/send-mail.dto';
 import { Public } from 'src/common/decorators/public.decorator';
 //import { CreateUserDto } from '../user/dto/create-user.dto';
-import { BroadcastEmailDto } from './dto/BroadCastEmailDto';
+//import { BroadcastEmailDto } from './dto/BroadCastEmailDto';
+import { Role } from 'src/common/constants/enums';
+import { SingleEmailDto } from './dto/single-email.dto';
+import { BulkEmailDto } from './dto/bulk-email.dto';
+import { Roles } from 'src/common/decorators/roles.decorator';
 @Controller('mail')
 export class MailController {
   constructor(private readonly mailService: MailService) {
@@ -21,16 +25,25 @@ export class MailController {
   private test(@Body() sendOTPMailDto: any) {
     return this.mailService.testSendUserFamilyLink(sendOTPMailDto);
   }
-// This endpoint was created to test the user broadcast email functionality.
-  @Public()
-  @Post('broadcast')
-  broadcastEmail(@Body() broadcastDto: BroadcastEmailDto){
-     return this.mailService.sendBroadcastEmail(
-       broadcastDto.userIds, 
-       broadcastDto.message,
-       broadcastDto.sendToAll
-     )
-  }
+// Admin Endpoints
+    @Get('stats')
+     @Roles(Role.Admin)
+    getEmailstats(){
+        return this.mailService.getEmailStats()
+    }
+
+    @Post('bulk')
+     @Roles(Role.Admin)
+    sendBulkEmail(@Body() bulkEmailDto: BulkEmailDto) {
+        return this.mailService.sendBulkEmail(bulkEmailDto);
+    }
+
+   // @Public()
+    @Post('single')
+    @Roles(Role.Admin)
+    sendSingleEmail(@Body() singleEmailDto: SingleEmailDto) {
+        return this.mailService.sendSingleEmail(singleEmailDto);
+    }
   
 
 }

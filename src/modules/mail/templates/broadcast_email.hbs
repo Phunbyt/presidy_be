@@ -1,49 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presidy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; font-family: 'Arial', sans-serif; color: #333333;">
-  <!-- Urgent Header -->
-  <tr>
-    <td style="padding: 25px 0; text-align: center; background-color: #FFEBEE; border-bottom: 3px solid #FF5252;">
-      <img src="https://d3ezi03spn2dw7.cloudfront.net/darkLogo.png" alt="Presidy Logo" width="140" style="max-width: 140px;">
-      <h2 style="color: #D32F2F; margin: 15px 0 0 0;">Become a moderator </h2>
-    </td>
-  </tr>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+        }
 
-  <!-- Main Content -->
-  <tr>
-    <td style="padding: 30px 20px;">
-      <h3 style="color: #2A5CBE; margin: 0 0 20px 0;">Dear Users</h3>
-      
-      <!-- Dispute Details Card -->
-      <div style="background: #FFF8E1; padding: 25px; margin: 20px 0; border-left: 4px solid #FFA000; border-radius: 4px;">
-        <div style="margin-bottom: 15px;">
-          <span style="display: block; color: #666; font-size: 14px; margin-bottom: 5px;">👤 User Email:</span>
-          <span style="font-weight: bold; color: #D32F2F;">{{email}}</span>
+        .wrapper {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            background-color: #1a1a2e;
+            padding: 24px 32px;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .body {
+            padding: 32px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #1a1a2e;
+        }
+
+        .message {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444444;
+            white-space: pre-line;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eeeeee;
+            margin: 32px 0;
+        }
+
+        .responsive-table {
+            width: 100%;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Presidy</h1>
         </div>
-        
 
-        <div>
-          <span style="display: block; color: #666; font-size: 14px; margin-bottom: 5px;">This is to inform you that you can become a moderator if there is no family to join</span>
+        <!-- Body -->
+        <div class="body">
+            <p class="greeting">Hi {{firstName}},</p>
+            <p class="message">{{message}}</p>
+            <hr class="divider"/>
+            <p style="font-size:13px; color:#888888;">
+                This message was sent to you by the Presidy team.
+                If you have any questions, contact us at
+                <a href="mailto:support@presidy.com">support@presidy.com</a>.
+            </p>
         </div>
-      </div>
 
-     
-    </td>
-  </tr>
+        <!-- Footer Partial -->
+        {{> footer}}
 
-
-  <!-- Footer -->
-  <tr>
-    <td style="background: #f8f9ff; padding: 25px 20px; text-align: center;">
-      <p style="font-size: 12px; color: #666; margin: 0;">
-        This is an automated  alert - Please do not ignore<br>
-        <span style="display: inline-block; margin: 8px 0;">⏳</span>
-      </p>
-        <p style="font-size: 12px; color: #666666; margin: 15px 0 0 0;">
-        Best wishes,<br>
-        The Presidy Team 🌟
-      </p>
-    </td>
-  </tr>
-</table>
-
-{{>footer}}
+    </div>
+</body>
+</html>

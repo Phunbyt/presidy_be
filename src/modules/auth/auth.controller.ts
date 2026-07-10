@@ -117,6 +117,7 @@ export class AuthController {
   getCurrentUser(@GetCurrentUser() user: UserType) {
     return this.authService.getCurrentUser(user);
   }
+    @Public()
     @Post('admin-login')
     login(@Body() body:AdminAuthDto){
         return this.authService.admin_login (body);

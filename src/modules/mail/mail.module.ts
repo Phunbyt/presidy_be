@@ -10,10 +10,12 @@ import { BullModule } from '@nestjs/bull';
 import { MailProcessor } from './mail.processor';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserSchema } from 'src/schemas/user.schema';
-
+import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: 'User', schema: UserSchema }]),
+    MongooseModule.forFeature([{ name: 'User', schema: UserSchema },
+      {name:'UserPlan',schema: UserPlanSchema}
+    ]),
     BullModule.registerQueue({
       name: 'email',
     }),
