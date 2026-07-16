@@ -21,6 +21,7 @@ import {
   ModeratorReceiptSchema,
 } from 'src/schemas/moderator-receipt.schema';
 import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
+import { MailModule } from '../mail/mail.module';
 
 @Module({
   controllers: [ModeratorController],
@@ -36,6 +37,7 @@ import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
       { name: Plan.name, schema: PlanSchema },
       {name:UserPlan.name, schema: UserPlanSchema}
     ]),
+    MailModule
   ],
 })
 export class ModeratorModule {}

@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  ConflictException
 } from '@nestjs/common';
 import { CreateUserDto, UpdateUserDto } from './dto/create-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -12,15 +13,18 @@ import { Plan } from 'src/schemas/plan.schema';
 import { UserType } from 'src/common/constants/types';
 import { UpdatePasswordDto } from '../auth/dto/signup.dto';
 import { hashDataWithBycrypt } from 'src/common/helpers/bycrypt.helper';
-//import { MailService } from '../mail/mail.service';
+import { MailService } from '../mail/mail.service';
 import { UserPlan } from 'src/schemas/user-plan.schema';
 import { FilterUserDto } from './dto/filter-user.dto';
+import { CreateOfflineUserDto } from './dto/create-offline-user.dto';
 @Injectable()
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>,
       @InjectModel('ModeratorPlan') private readonly ModeratorModel: Model<ModeratorPlan>,
             @InjectModel('Plan') private readonly PlanModel: Model<Plan>,
-            @InjectModel('UserPlan') private readonly UserPlanModel: Model<UserPlan>
+            @InjectModel('UserPlan') private readonly UserPlanModel: Model<UserPlan>,
+            @InjectModel(ModeratorPlan.name) private moderatorPlanModel: Model<ModeratorPlan>,
+            private readonly mailService: MailService
      
 ) {}
   
@@ -300,5 +304,59 @@ async getUserStats() {
     const inactive = total - active;
 
     return { total, active, inactive, offline };
+}
+async addOfflineUser(dto: CreateOfflineUserDto) {
+    const { firstName, lastName, email, phoneNumber, moderatorId, subscriptionDuration } = dto;
+
+    const existing = await this.userModel.findOne({ email });
+    if (existing) throw new ConflictException('A user with this email already exists');
+
+    const moderatorPlan = await this.moderatorPlanModel.findOne({user:new Types.ObjectId(moderatorId)})
+    .populate('user','firstName lastName email')
+    .populate('planId', 'name')
+
+    if (!moderatorPlan) throw new NotFoundException('This moderator has no active family plan');
+
+    const limit = moderatorPlan.familyMembersLimit ?? 5;
+    if ((moderatorPlan.users?.length ?? 0) >= limit) {
+        throw new BadRequestException('This family is already full');
+    }
+
+    const user = await this.userModel.create({
+        firstName: firstName.toLowerCase(),
+        lastName: lastName.toLowerCase(),
+        email: email.toLowerCase(),
+        username: email.split('@')[0],
+        phoneNumber,
+        country: 'ng',
+        password: '',
+        isVerified: true,
+        isModerator: false,
+        isOffline: true,
+        ...(subscriptionDuration ? { subscriptionDuration } : {}),
+    });
+    moderatorPlan.users.push(user._id as any);
+    await moderatorPlan.save();
+
+    const moderatorUser = moderatorPlan.user as any;
+    const plan = moderatorPlan.planId as any;
+
+    // fire both emails (to the new member + to the moderator) — not awaited
+    // so a slow/failed email never blocks this response
+    this.mailService.sendOfflineUserAddedEmails({
+        memberName: `${firstName} ${lastName}`,
+        memberEmail: email,
+        memberPhone: phoneNumber,
+        moderatorName: `${moderatorUser?.firstName ?? ''} ${moderatorUser?.lastName ?? ''}`.trim(),
+        moderatorEmail: moderatorUser?.email,
+        planName: plan?.name ?? 'their plan',
+        subscriptionDuration,
+        currentCount: moderatorPlan.users.length,
+        familyLimit: limit,
+    });
+
+      
+
+    return user;
 }
 }

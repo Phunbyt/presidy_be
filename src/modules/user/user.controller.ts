@@ -7,6 +7,7 @@ import {
   Param,
   Query
 } from '@nestjs/common';
+import { CreateOfflineUserDto } from './dto/create-offline-user.dto';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FilterUserDto } from './dto/filter-user.dto';
@@ -34,5 +35,11 @@ export class UserController {
     @Roles(Role.Admin)
     getUsers(@Query() filterUserDto:FilterUserDto ){
         return this.userService.getUsers(filterUserDto)
-    }  
+    }
+  
+    @Post('offline')
+    @Roles(Role.Admin)
+    addOfflineUser(@Body() dto: CreateOfflineUserDto){
+      return this.userService.addOfflineUser(dto)
+    }
 }

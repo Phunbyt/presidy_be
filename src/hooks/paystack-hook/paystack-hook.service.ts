@@ -52,34 +52,183 @@ export class PaystackHookService {
           metadata.email,
         );
       }
+
+        else if(event === 'paymentrequest.success'){
+           const existingTransaction = await this.transactionModel.findOne({
+          txRef:data.reference,
+        })
+
+        if(existingTransaction){
+          console.log(`This transaction ${data.reference} has already been processed`)
+          return 'Duplicate event, already processed'
+        }
+
+        await this.transactionModel.create({
+          user: new Types.ObjectId(metadata.userId),
+          planId: new Types.ObjectId(metadata.planId),
+          email: metadata.email,
+          status: data.status,
+          amount: data.amount,
+          currency: data.currency,
+          channel: data.channel,
+          txRef: data.reference,
+        });
+         await this.planService.joinPlan(
+          metadata.userId,
+          metadata.planId,
+          metadata.email,
+        );
+       }
        else if(event === 'paymentrequest.pending'){
       
-       }
-        else if(event === 'paymentrequest.success'){
-      
-       }
-        else if(event === 'subscription.create'){
-      
-       }
-       else if(event === 'subscription.disable'){
-      
-       }
-       else if(event === 'subscription.expiring_cards'){
-      
-       }
-       else if(event === 'subscription.not_renew'){
-      
-       }
-       else if(event === 'invoice.create'){
-      
-       }
-       else if(event === 'invoice.payment_failed'){
-      
-       }
-       else if(event === 'invoice.update'){
-      
-       }
+       }       
+else if (event === 'subscription.create') {
+    const existingTransaction = await this.transactionModel.findOne({
+        txRef: data.reference,
+    });
 
+    if (existingTransaction) {
+        console.log(`This transaction ${data.reference} has already been processed`);
+        return 'Duplicate event, already processed';
+    }
+
+    await this.transactionModel.create({
+        user: new Types.ObjectId(metadata.userId),
+        planId: new Types.ObjectId(metadata.planId),
+        email: metadata.email,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
+        channel: data.channel,
+        txRef: data.reference,
+    });
+
+    await this.planService.handleSubscriptionCreated(
+        metadata.userId,
+        metadata.planId,
+        metadata.email,
+    );
+}
+
+else if (event === 'subscription.disable') {
+    const existingTransaction = await this.transactionModel.findOne({
+        txRef: data.reference,
+    });
+
+    if (existingTransaction) {
+        console.log(`This transaction ${data.reference} has already been processed`);
+        return 'Duplicate event, already processed';
+    }
+
+    await this.transactionModel.create({
+        user: new Types.ObjectId(metadata.userId),
+        planId: new Types.ObjectId(metadata.planId),
+        email: metadata.email,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
+        channel: data.channel,
+        txRef: data.reference,
+    });
+
+    await this.planService.handleSubscriptionDisabled(
+        metadata.userId,
+        metadata.planId,
+        metadata.email,
+    );
+}
+    else if (event === 'subscription.expiring_cards') {
+        await this.planService.handleCardExpiring(
+            metadata.userId,
+            metadata.planId,
+            metadata.email,
+        );
+    }
+
+else if (event === 'subscription.not_renew') {
+    const existingTransaction = await this.transactionModel.findOne({
+        txRef: data.reference,
+    });
+
+    if (existingTransaction) {
+        console.log(`This transaction ${data.reference} has already been processed`);
+        return 'Duplicate event, already processed';
+    }
+
+    await this.transactionModel.create({
+        user: new Types.ObjectId(metadata.userId),
+        planId: new Types.ObjectId(metadata.planId),
+        email: metadata.email,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
+        channel: data.channel,
+        txRef: data.reference,
+    });
+
+    await this.planService.handleSubscriptionNotRenewing(
+        metadata.userId,
+        metadata.planId,
+        metadata.email,
+    );
+}
+
+else if (event === 'invoice.create') {
+    await this.planService.handleUpcomingInvoice(
+        metadata.userId,
+        metadata.planId,
+        metadata.email,
+    );
+}
+
+else if (event === 'invoice.payment_failed') {
+    const existingTransaction = await this.transactionModel.findOne({
+        txRef: data.reference,
+    });
+
+    if (existingTransaction) {
+        console.log(`This transaction ${data.reference} has already been processed`);
+        return 'Duplicate event, already processed';
+    }
+
+    await this.transactionModel.create({
+        user: new Types.ObjectId(metadata.userId),
+        planId: new Types.ObjectId(metadata.planId),
+        email: metadata.email,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
+        channel: data.channel,
+        txRef: data.reference,
+    });
+
+    await this.planService.handlePaymentFailed(
+        metadata.userId,
+        metadata.planId,
+        metadata.email,
+    );
+}
+else if (event === 'invoice.update') {
+    const existingTransaction = await this.transactionModel.findOne({
+        txRef: data.reference,
+    });
+
+    if (existingTransaction) {
+        console.log(`This transaction ${data.reference} has already been processed`);
+        return 'Duplicate event, already processed';
+    }
+
+    await this.transactionModel.create({
+        user: new Types.ObjectId(metadata.userId),
+        planId: new Types.ObjectId(metadata.planId),
+        email: metadata.email,
+        status: data.status,
+        amount: data.amount,
+        currency: data.currency,
+        channel: data.channel,
+        txRef: data.reference,
+    });
+}       
 
     }
     

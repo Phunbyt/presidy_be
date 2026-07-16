@@ -14,6 +14,11 @@ import { UserPlan } from 'src/schemas/user-plan.schema';
 import { BulkEmailDto } from './dto/bulk-email.dto';
 import { SingleEmailDto } from './dto/single-email.dto';
 import { join } from 'path';
+import { SendPaymentFailedDto } from './dto/send-payment-failed.dto';
+import { SendSubscriptionCancelledDto } from './dto/send-subscription-cancelled.dto';
+import { SendSubscriptionConfirmedDto } from './dto/send-subscription-confirmed.dto';
+import { SendCardExpiringDto } from './dto/send-card-expiring.dto';
+import { SendUpcomingInvoiceDto } from './dto/send-upcoming-invoice.dto';
 import {
   SendNewFamilyPromptDto,
   SendSupportMessageDto,
@@ -324,6 +329,165 @@ async sendSingleEmail(singleEmailDto: SingleEmailDto) {
 
         return {total, users, moderators, active, inactive};
     }
+// Services for the Paystack WebHooks
+
+public async sendPaymentFailedEmail(sendPaymentFailedDto: SendPaymentFailedDto) {
+    try {
+        const { name, email, planName } = sendPaymentFailedDto;
+
+        await this.mailService.sendMail({
+            to: email,
+            subject: 'Payment Failed — Action Needed',
+            template: './payment-failed',
+            context: {
+                name,
+                planName,
+            },
+        });
+
+        return 'This action adds a new mail';
+    } catch (error) {
+        console.log(error);
+        console.log('error....sendPaymentFailedEmail');
+    }
+}
+
+public async sendSubscriptionCancelledEmail(sendSubscriptionCancelledDto: SendSubscriptionCancelledDto) {
+    try {
+        const { name, email, planName, message } = sendSubscriptionCancelledDto;
+
+        await this.mailService.sendMail({
+            to: email,
+            subject: 'Subscription Update',
+            template: './subscription-cancelled',
+            context: {
+                name,
+                planName,
+                message,
+            },
+        });
+
+        return 'This action adds a new mail';
+    } catch (error) {
+        console.log(error);
+        console.log('error....sendSubscriptionCancelledEmail');
+    }
+}
+
+public async sendSubscriptionConfirmedEmail(sendSubscriptionConfirmedDto: SendSubscriptionConfirmedDto) {
+    try {
+        const { name, email, planName, amount } = sendSubscriptionConfirmedDto;
+
+        await this.mailService.sendMail({
+            to: email,
+            subject: "You're All Set!",
+            template: './subscription-confirmed',
+            context: {
+                name,
+                planName,
+                amount,
+            },
+        });
+
+        return 'This action adds a new mail';
+    } catch (error) {
+        console.log(error);
+        console.log('error....sendSubscriptionConfirmedEmail');
+    }
+}
+
+public async sendCardExpiringEmail(sendCardExpiringDto: SendCardExpiringDto) {
+    try {
+        const { name, email, planName } = sendCardExpiringDto;
+
+        await this.mailService.sendMail({
+            to: email,
+            subject: 'Your Card Is Expiring Soon',
+            template: './card-expiring',
+            context: {
+                name,
+                planName,
+            },
+        });
+
+        return 'This action adds a new mail';
+    } catch (error) {
+        console.log(error);
+        console.log('error....sendCardExpiringEmail');
+    }
+}
+
+public async sendUpcomingInvoiceEmail(sendUpcomingInvoiceDto: SendUpcomingInvoiceDto) {
+    try {
+        const { name, email, planName, amount } = sendUpcomingInvoiceDto;
+
+        await this.mailService.sendMail({
+            to: email,
+            subject: 'Upcoming Renewal',
+            template: './upcoming-invoice',
+            context: {
+                name,
+                planName,
+                amount,
+            },
+        });
+
+        return 'This action adds a new mail';
+    } catch (error) {
+        console.log(error);
+        console.log('error....sendUpcomingInvoiceEmail');
+    }
+}
+
+async sendOfflineUserAddedEmails(params: {
+    memberName: string;
+    memberEmail: string;
+    memberPhone: string;
+    moderatorName: string;
+    moderatorEmail: string;
+    planName: string;
+    subscriptionDuration?: string;
+    currentCount: number;
+    familyLimit: number;
+}) {
+    const {
+        memberName, memberEmail, memberPhone,
+        moderatorName, moderatorEmail, planName,
+        subscriptionDuration, currentCount, familyLimit,
+    } = params;
+
+    try {
+        // Email #1 — welcomes the new offline member to the family
+        await this.mailService.sendMail({
+            to: memberEmail,
+            subject: `Welcome to ${moderatorName}'s ${planName} Family`,
+            template: './offline-user-welcome',
+            context: {
+                name: memberName,
+                moderatorName,
+                planName,
+                subscriptionDuration: subscriptionDuration ?? 'N/A',
+            },
+        });
+
+        // Email #2 — notifies the moderator that someone was added to their family
+        await this.mailService.sendMail({
+            to: moderatorEmail,
+            subject: `New Member Added — ${planName}`,
+            template: './offline-user-added-moderator',
+            context: {
+                moderatorName, memberName, memberEmail, memberPhone, planName,
+                subscriptionDuration: subscriptionDuration ?? 'N/A',
+                currentCount, familyLimit,
+            },
+        });
+    } catch (error) {
+        // matches the try/catch pattern already used elsewhere in this file —
+        // a failed email should never crash the request that triggered it
+        console.log(error);
+        console.log('sendOfflineUserAddedEmails error....');
+    }
+}
 
 
 }

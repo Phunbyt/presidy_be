@@ -432,4 +432,122 @@ export class PlanService {
         return { data };
     }
 
+    // Paystack Webhooks
+async handlePaymentFailed(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendPaymentFailedEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handlePaymentFailed');
+    }
+}
+
+async handleSubscriptionDisabled(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        const moderatorPlan = await this.moderatorPlanModel.findOne({
+            users: { $in: [foundUser._id] },
+        });
+
+        if (moderatorPlan) {
+            moderatorPlan.users = moderatorPlan.users.filter(
+                (id: any) => id.toString() !== foundUser._id.toString(),
+            );
+            await moderatorPlan.save();
+        }
+
+        await this.mailService.sendSubscriptionCancelledEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            message: 'Your subscription has been disabled and access has ended.',
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionDisabled');
+    }
+}
+
+async handleSubscriptionNotRenewing(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendSubscriptionCancelledEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            message: 'Your subscription will not renew after the current cycle.',
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionNotRenewing');
+    }
+}
+
+async handleSubscriptionCreated(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendSubscriptionConfirmedEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            amount: foundPlan.price,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionCreated');
+    }
+}
+
+async handleCardExpiring(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendCardExpiringEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleCardExpiring');
+    }
+}
+
+async handleUpcomingInvoice(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendUpcomingInvoiceEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            amount: foundPlan.price,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleUpcomingInvoice');
+    }
+}
+
 }

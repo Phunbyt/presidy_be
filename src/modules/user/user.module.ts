@@ -6,7 +6,7 @@ import { User, UserSchema } from 'src/schemas/user.schema';
 import { ModeratorPlan, ModeratorPlanSchema } from 'src/schemas/moderator-plan.schema';
 import { Plan, PlanSchema } from 'src/schemas/plan.schema';
 import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
-
+import { MailModule } from '../mail/mail.module';
 @Module({
   imports: [
     MongooseModule.forFeature([
@@ -15,6 +15,7 @@ import { UserPlan, UserPlanSchema } from 'src/schemas/user-plan.schema';
       { name: Plan.name, schema: PlanSchema },
       { name: UserPlan.name, schema: UserPlanSchema },
     ]),
+    MailModule
   ],
   controllers: [UserController],
   providers: [UserService],
