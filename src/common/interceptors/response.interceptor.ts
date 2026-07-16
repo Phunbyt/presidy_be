@@ -65,6 +65,22 @@ export class ResponseInterceptor implements NestInterceptor {
     });
   }
 
+  // private responseHandler(res: any, context: ExecutionContext) {
+  //   const ctx = context.switchToHttp();
+  //   const response = ctx.getResponse();
+  //   const request = ctx.getRequest();
+
+  //   const statusCode = response.statusCode;
+
+  //   return {
+  //     status: true,
+  //     path: request.url,
+  //     statusCode,
+  //     data: res.data ? res.data : res,
+  //     pagination: res.pagination ?? false,
+  //   };
+  // }
+
   private responseHandler(res: any, context: ExecutionContext) {
     const ctx = context.switchToHttp();
     const response = ctx.getResponse();
@@ -72,12 +88,24 @@ export class ResponseInterceptor implements NestInterceptor {
 
     const statusCode = response.statusCode;
 
+    // Determine if the service returned structured pagination metadata
+    const isPaginated = res && res.data && res.total !== undefined;
+
     return {
       status: true,
       path: request.url,
       statusCode,
-      data: res.data ? res.data : res,
-      pagination: res.pagination ?? false,
+      data: res?.data ? res.data : res,
+      
+      // Conditionally inject pagination metadata back into the root envelope
+      ...(isPaginated && {
+        total: res.total,
+        page: res.page,
+        limit: res.limit,
+        totalPages: res.totalPages,
+      }),
+      
+      pagination: isPaginated ? true : (res?.pagination ?? false),
     };
   }
 }

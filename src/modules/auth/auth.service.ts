@@ -16,7 +16,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import * as OTPEngine from 'generate-password';
-
+import * as bcrypt from'bcrypt';
 import {
   compareDataWithBycrypt,
   hashDataWithBycrypt,
@@ -27,7 +27,10 @@ import { UserService } from '../user/user.service';
 import { UserType } from 'src/common/constants/types';
 import { JwtService } from '@nestjs/jwt';
 import { jwtDecode } from 'jwt-decode';
+import { AdminAuthDto } from './dto/auth_admin.dto';
+import { UnauthorizedException } from '@nestjs/common';
 import { AppConfigService } from 'src/common/config/app-config.service';
+
 import {
   uniqueNamesGenerator,
   adjectives,
@@ -628,4 +631,41 @@ export class AuthService {
       username,
     };
   }
+
+   async admin_login(authDto:AdminAuthDto){
+       
+        const {email, password} = authDto;
+
+        const actualEmail = this.appConfigService.adminEmail;
+        const actaulPassword = this.appConfigService.adminPassword;
+
+        if(email != actualEmail){
+            throw new UnauthorizedException('Invalid Email');
+
+        }
+
+        const isPasswordValid = await bcrypt.compare(
+            password,
+            actaulPassword
+        )
+
+        if(!isPasswordValid) throw new UnauthorizedException('Invalid Email or Password')
+        
+        const payload = { // Super Admin
+
+            sub:'admin',
+            email:this.appConfigService.adminEmail,
+            role:'admin'
+        }
+
+        const token = this.jwtService.sign(payload, {
+            secret : this.appConfigService.jwtAccessSecret,
+            expiresIn: '7d'
+        })
+
+        return {accessToken : token}
+
+    }
+
+  // Auth Login for admin
 }

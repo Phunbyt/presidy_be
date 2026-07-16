@@ -69,4 +69,13 @@ export class AppConfigService {
   public get paystackPK(): string {
     return this.configService.get<string>('app.paystackPK');
   }
+
+  public get adminPassword(): string {
+    return this.configService.get<string>('app.adminPassword')!;
+  }
+
+  public get adminEmail(): string {
+    return this.configService.get<string>('app.adminEmail')!;
+  }
+
 }

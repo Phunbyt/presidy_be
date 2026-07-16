@@ -12,6 +12,7 @@ import { UserType } from 'src/common/constants/types';
 import { Public } from 'src/common/decorators/public.decorator';
 import { GetAppleUser } from 'src/common/decorators/get-apple-user.decorator';
 import { GetGoogleUser } from 'src/common/decorators/get-google-user.decorator';
+import { AdminAuthDto } from './dto/auth_admin.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -116,4 +117,11 @@ export class AuthController {
   getCurrentUser(@GetCurrentUser() user: UserType) {
     return this.authService.getCurrentUser(user);
   }
+    @Public()
+    @Post('admin-login')
+    login(@Body() body:AdminAuthDto){
+        return this.authService.admin_login (body);
+    }
+
+  
 }

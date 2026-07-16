@@ -4,11 +4,11 @@ import { AuthController } from './auth.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { Otp, OtpSchema } from 'src/schemas/otp.schema';
-import { UserService } from '../user/user.service';
 import { MailModule } from '../mail/mail.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './strategies/accessToken.strategy';
 import { AppConfigModule } from 'src/common/config/app-config.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -18,11 +18,12 @@ import { AppConfigModule } from 'src/common/config/app-config.module';
     ]),
     MailModule,
     AppConfigModule,
+    UserModule,
     JwtModule.register({
       global: true,
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserService, AccessTokenStrategy],
+  providers: [AuthService, AccessTokenStrategy],
 })
 export class AuthModule {}

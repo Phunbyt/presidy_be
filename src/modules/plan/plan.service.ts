@@ -24,6 +24,8 @@ import { MailService } from '../mail/mail.service';
 import { User } from 'src/schemas/user.schema';
 import { SubscribeDto } from './dto/subscribe.dto';
 import { ModeratorPlan } from 'src/schemas/moderator-plan.schema';
+// import { metadata } from 'reflect-metadata/no-conflict';
+// import { string } from 'joi';
 
 @Injectable()
 export class PlanService {
@@ -293,8 +295,40 @@ export class PlanService {
       return { paymentLink: data.data.authorization_url };
     } catch (error) {
       console.log(error);
-      console.log('error....');
+      throw new InternalServerErrorException();
+    }
+  }
 
+  async retryPayment(user: UserType,subscribeDto: SubscribeDto ) {
+      const { planId, email } = subscribeDto;
+    try {
+      const foundPlan = await this.planModel.findOne({
+        _id: new Types.ObjectId(planId),
+        status: PlanStatus.ACTIVE,
+      });
+      if (!foundPlan) {
+        throw new NotFoundException('Plan not found');
+      }
+      const url = this.appConfigService.paystackUrl;
+      const payload = {
+        amount: foundPlan.price,
+        email: email,
+        plan: foundPlan.planCode,
+        metadata: {
+          userId:user._id,
+          planId: foundPlan._id,
+          email,
+        },
+      };
+
+      const { data } = await axios.post(url, payload, {
+        headers: {
+          authorization: `Bearer ${this.appConfigService.paystackSK}`,
+        },
+      });
+      return { paymentLink: data.data.authorization_url };
+    } catch (error) {
+      console.log(error);
       throw new InternalServerErrorException();
     }
   }
@@ -391,4 +425,129 @@ export class PlanService {
 
     return newDispute;
   }
+
+  // Get Plans For Admin
+    async getPlans() {
+        const data = await this.planModel.find().select('name logoUrl price').exec();
+        return { data };
+    }
+
+    // Paystack Webhooks
+async handlePaymentFailed(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendPaymentFailedEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handlePaymentFailed');
+    }
+}
+
+async handleSubscriptionDisabled(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        const moderatorPlan = await this.moderatorPlanModel.findOne({
+            users: { $in: [foundUser._id] },
+        });
+
+        if (moderatorPlan) {
+            moderatorPlan.users = moderatorPlan.users.filter(
+                (id: any) => id.toString() !== foundUser._id.toString(),
+            );
+            await moderatorPlan.save();
+        }
+
+        await this.mailService.sendSubscriptionCancelledEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            message: 'Your subscription has been disabled and access has ended.',
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionDisabled');
+    }
+}
+
+async handleSubscriptionNotRenewing(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendSubscriptionCancelledEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            message: 'Your subscription will not renew after the current cycle.',
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionNotRenewing');
+    }
+}
+
+async handleSubscriptionCreated(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendSubscriptionConfirmedEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            amount: foundPlan.price,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleSubscriptionCreated');
+    }
+}
+
+async handleCardExpiring(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendCardExpiringEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleCardExpiring');
+    }
+}
+
+async handleUpcomingInvoice(userId: string, planId: string, email: string) {
+    try {
+        const foundUser = await this.userModel.findById(userId);
+        const foundPlan = await this.planModel.findById(planId);
+        if (!foundUser || !foundPlan) return;
+
+        await this.mailService.sendUpcomingInvoiceEmail({
+            email: foundUser.email,
+            name: foundUser.firstName,
+            planName: foundPlan.name,
+            amount: foundPlan.price,
+        });
+    } catch (error) {
+        console.log(error);
+        console.log('error.....handleUpcomingInvoice');
+    }
+}
+
 }

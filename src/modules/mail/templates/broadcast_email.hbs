@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presidy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333333;
+        }
+
+        .wrapper {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .header {
+            background-color: #1a1a2e;
+            padding: 24px 32px;
+        }
+
+        .header h1 {
+            color: #ffffff;
+            font-size: 20px;
+        }
+
+        .body {
+            padding: 32px;
+        }
+
+        .greeting {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #1a1a2e;
+        }
+
+        .message {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #444444;
+            white-space: pre-line;
+        }
+
+        .divider {
+            border: none;
+            border-top: 1px solid #eeeeee;
+            margin: 32px 0;
+        }
+
+        .responsive-table {
+            width: 100%;
+        }
+
+        .responsive-img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+
+        <!-- Header -->
+        <div class="header">
+            <h1>Presidy</h1>
+        </div>
+
+        <!-- Body -->
+        <div class="body">
+            <p class="greeting">Hi {{firstName}},</p>
+            <p class="message">{{message}}</p>
+            <hr class="divider"/>
+            <p style="font-size:13px; color:#888888;">
+                This message was sent to you by the Presidy team.
+                If you have any questions, contact us at
+                <a href="mailto:support@presidy.com">support@presidy.com</a>.
+            </p>
+        </div>
+
+        <!-- Footer Partial -->
+        {{> footer}}
+
+    </div>
+</body>
+</html>
